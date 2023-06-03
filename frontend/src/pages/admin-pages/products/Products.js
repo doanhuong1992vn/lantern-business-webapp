@@ -8,21 +8,21 @@ import {Image} from 'primereact/image';
 import {Toolbar} from 'primereact/toolbar';
 import {InputTextarea} from 'primereact/inputtextarea';
 import {RadioButton} from 'primereact/radiobutton';
-import {InputNumber} from 'primereact/inputnumber';
 import {Dialog} from 'primereact/dialog';
 import {InputText} from 'primereact/inputtext';
 import storage from "~/firebaseConfig";
-import {ref, uploadBytesResumable, getDownloadURL} from "firebase/storage";
+import {getDownloadURL, ref, uploadBytesResumable} from "firebase/storage";
 
 
 import * as productService from '~/services/ProductService'
 import * as categoryService from "~/services/CategoryService";
+import {logDOM} from "@testing-library/react";
 
 const Products = () => {
     console.log("products re-render")
     let newProduct = {
         name: '',
-        image: '',
+        image: null,
         description: '',
         category: {},
     };
@@ -36,7 +36,6 @@ const Products = () => {
     const [selectedProductList, setSelectedProductList] = useState(null);
     const [submitted, setSubmitted] = useState(false);
     const [globalFilter, setGlobalFilter] = useState(null);
-    const [url, setUrl] = useState('');
     const [errorByName, setErrorByName] = useState('');
 
 
@@ -80,7 +79,29 @@ const Products = () => {
         setDeleteProductListDialog(false);
     };
 
-    const saveProduct = () => {
+    function updateProduct(_product, _productList) {
+        productService.update(_product)
+            .then((response) => setProduct(response.data))
+            .catch((error) => console.log(error));
+        const index = findIndexById(product.id);
+        _productList[index] = _product;
+        toast.current.show({severity: 'success', summary: 'Successful', detail: 'Product Updated', life: 3000});
+    }
+
+    function saveProduct(_product, _productList) {
+        productService.save(_product)
+            .then((response) => setProduct(response.data))
+            .catch((error) => console.log(error));
+        _productList.unshift(_product);
+        toast.current.show({
+            severity: 'success',
+            summary: 'Successful',
+            detail: 'Product Created',
+            life: 3000
+        });
+    }
+
+    const handleSaveProduct = () => {
         if (errorByName) {
             return;
         }
@@ -89,13 +110,7 @@ const Products = () => {
         if (product.name.trim()) {
             let _productList = [...productList];
             let _product = {...product};
-
-            if (product.id) {
-                const index = findIndexById(product.id);
-
-                _productList[index] = _product;
-                toast.current.show({severity: 'success', summary: 'Successful', detail: 'Product Updated', life: 3000});
-            } else {
+            if (file) {
                 const storageRef = ref(storage, `/files/${file.name}`);
                 const uploadTask = uploadBytesResumable(storageRef, file);
                 uploadTask.on(
@@ -108,21 +123,28 @@ const Products = () => {
                     (err) => console.log(err),
                     () => {
                         getDownloadURL(uploadTask.snapshot.ref).then((url) => {
-                            console.log(url);
-                            // setUrl(url);
                             _product.image = url;
-                            productService.save(_product)
-                                .then((response) => setProduct(response.data))
-                                .catch((error) => console.log(error));
-                            _productList.unshift(_product);
-                            toast.current.show({severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000});
+                            console.log("id hiện tại: " + _product.id)
+                            if (_product.id) {
+                                updateProduct(_product, _productList);
+                            } else {
+                                saveProduct(_product, _productList);
+                            }
                         });
                     }
                 );
+            } else {
+                console.log("id hiện tại: " + _product.id)
+                if (_product.id) {
+                    updateProduct(_product, _productList);
+                } else {
+                    saveProduct(_product, _productList);
+                }
             }
             setProductList(_productList);
             setProductDialog(false);
             setProduct(newProduct);
+            setFile(null);
         }
     };
 
@@ -137,8 +159,8 @@ const Products = () => {
     };
 
     const deleteProduct = () => {
+        productService.deleteById(product.id).then().catch(err => console.log(err));
         let _products = productList.filter((val) => val.id !== product.id);
-
         setProductList(_products);
         setDeleteProductDialog(false);
         setProduct(newProduct);
@@ -167,8 +189,11 @@ const Products = () => {
     };
 
     const deleteSelectedProducts = () => {
+        let ids = [];
+        selectedProductList.map(item => ids.push(item.id));
+        console.log(ids);
+        productService.deleteByIds(ids);
         let _products = productList.filter((val) => !selectedProductList.includes(val));
-
         setProductList(_products);
         setDeleteProductListDialog(false);
         setSelectedProductList(null);
@@ -190,14 +215,14 @@ const Products = () => {
         setProduct(_product);
     };
 
-    const onInputNumberChange = (e, name) => {
-        const val = e.value || 0;
-        let _product = {...product};
-
-        _product[`${name}`] = val;
-
-        setProduct(_product);
-    };
+    // const onInputNumberChange = (e, name) => {
+    //     const val = e.value || 0;
+    //     let _product = {...product};
+    //
+    //     _product[`${name}`] = val;
+    //
+    //     setProduct(_product);
+    // };
 
     const leftToolbarTemplate = () => {
         return (
@@ -245,7 +270,7 @@ const Products = () => {
     const productDialogFooter = (
         <React.Fragment>
             <Button label="Cancel" icon="pi pi-times" outlined onClick={hideDialog}/>
-            <Button label="Save" icon="pi pi-check" onClick={saveProduct}/>
+            <Button label="Save" icon="pi pi-check" onClick={handleSaveProduct}/>
         </React.Fragment>
     );
     const deleteProductDialogFooter = (
@@ -275,6 +300,11 @@ const Products = () => {
         }
     }
 
+    function handleChangeSelection(e) {
+        console.log(e.value)
+        setSelectedProductList(e.value);
+    }
+
     return (
         <div>
             <Toast ref={toast}/>
@@ -282,12 +312,12 @@ const Products = () => {
                 <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
                 <DataTable ref={dt} value={productList} selection={selectedProductList}
-                           onSelectionChange={(e) => setSelectedProductList(e.value)}
+                           onSelectionChange={handleChangeSelection}
                            dataKey="id" paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
                            globalFilter={globalFilter} header={header}>
-                    <Column selectionMode="multiple" exportable={false}></Column>
+                    <Column selectionMode="multiple" exportable={true}></Column>
                     <Column field="name" header="Name" sortable style={{minWidth: '16rem'}}></Column>
                     <Column field="image" header="Image" body={imageBodyTemplate}></Column>
                     <Column field="category.name" header="Category" sortable style={{minWidth: '10rem'}}></Column>
@@ -323,14 +353,15 @@ const Products = () => {
                                title={"* Tên sản phẩm không được vượt quá 50 ký tự"}
                     />
                     <small className="p-error">{errorByName}</small>
-                    {submitted && !product.name && <small className="p-error">* Tên sản phẩm không được để trống!</small>}
+                    {submitted && !product.name &&
+                        <small className="p-error">* Tên sản phẩm không được để trống!</small>}
                 </div>
                 <div className="field">
                     <label htmlFor="description" className="font-bold">
                         Description
                     </label>
                     <InputTextarea id="description" onChange={(e) => handleOnChangeInput(e, 'description')}
-                                    required rows={3} cols={20} value={product.description} maxLength={2000}
+                                   required rows={3} cols={20} value={product.description} maxLength={2000}
                                    title={"* Mô tả sản phẩm không vượt quá 2000 ký tự."}
                     />
                 </div>

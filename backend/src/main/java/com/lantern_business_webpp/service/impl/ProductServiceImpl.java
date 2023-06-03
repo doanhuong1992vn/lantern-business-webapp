@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
-    private final GeneralConverter<Product, ProductResponseDTO, ProductRequestDTO> productConverter;
+    private final GeneralConverter<Product, ProductRequestDTO, ProductResponseDTO> productConverter;
 
 
 //    @Override
@@ -30,8 +31,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponseDTO save(ProductRequestDTO productRequestDTO) {
-        Product product = productConverter.convertToEntity(productRequestDTO);
-        return productConverter.convertToDTO(productRepository.save(product));
+        Product product = productConverter.convertRequestToEntity(productRequestDTO);
+        return productConverter.convertEntityToResponse(productRepository.save(product));
     }
 
 //    @Override
@@ -41,12 +42,16 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void delete(Long id) {
-        productRepository.deleteById(id);
+        Optional<Product> optionalProduct = productRepository.findById(id);
+        if (optionalProduct.isPresent()) {
+            Product product = optionalProduct.get();
+            product.setActive(false);
+            productRepository.save(product);
+        }
     }
 
 //    @Override
 //    public ProductResponseDTO update(ProductRequestDTO productRequestDTO) {
-//
 //    }
 
 //    @Override
@@ -67,7 +72,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductResponseDTO> findByActiveTrue() {
         return productRepository.findByActiveTrue().stream()
-                .map(productConverter::convertToDTO)
+                .map(productConverter::convertEntityToResponse)
                 .collect(Collectors.toList());
     }
 
@@ -82,7 +87,28 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Optional<ProductResponseDTO> findById(Long id) {
-        return Optional.empty();
+    public boolean deleteByIds(Long[] ids) {
+        List<Product> products = new ArrayList<>();
+        for (Long id : ids) {
+            Optional<Product> optionalProduct = productRepository.findById(id);
+            if (optionalProduct.isPresent()) {
+                products.add(optionalProduct.get());
+            } else {
+                return false;
+            }
+        }
+        for (Product product : products) {
+            product.setActive(false);
+            productRepository.save(product);
+        }
+        return true;
+    }
+
+    @Override
+    public ProductResponseDTO findById(Long id) {
+        return productRepository
+                .findById(id)
+                .map(productConverter::convertEntityToResponse)
+                .orElse(null);
     }
 }

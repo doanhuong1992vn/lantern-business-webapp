@@ -1,7 +1,6 @@
 package com.lantern_business_webpp.controller;
 
 import com.lantern_business_webpp.entity.Product;
-//import com.lantern_business_webpp.exception.ValidationException;
 import com.lantern_business_webpp.payload.request.ProductRequestDTO;
 import com.lantern_business_webpp.payload.response.ProductResponseDTO;
 import com.lantern_business_webpp.service.ProductService;
@@ -15,7 +14,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -47,10 +45,40 @@ public class ProductController {
             System.out.println(bindingResult);
             return new ResponseEntity<>(bindingResult.getAllErrors(), HttpStatus.BAD_REQUEST);
         }
-
         ProductResponseDTO productResponseDTO = productService.save(productRequestDTO);
         return new ResponseEntity<>(productResponseDTO, HttpStatus.CREATED);
     }
+
+    @PutMapping
+    public ResponseEntity<?> update(
+            @Valid @RequestBody ProductRequestDTO productRequestDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            System.out.println(bindingResult);
+            return new ResponseEntity<>(bindingResult.getAllErrors(), HttpStatus.BAD_REQUEST);
+        }
+        ProductResponseDTO productResponseDTO = productService.save(productRequestDTO);
+        return new ResponseEntity<>(productResponseDTO, HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        ProductResponseDTO productResponseDTO = productService.findById(id);
+        if (productResponseDTO == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            productService.delete(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+    }
+
+//    @DeleteMapping
+//    public ResponseEntity<?> delete(@RequestBody Long[] ids) {
+//        boolean success = productService.deleteByIds(ids);
+//        if (success) {
+//            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+//        }
+//        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//    }
 
     @GetMapping("/pagination")
     public ResponseEntity<?> findAll(@PageableDefault(size = 5) Pageable pageable) {

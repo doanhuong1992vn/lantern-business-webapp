@@ -7,7 +7,7 @@ public interface GeneralService<REQUEST_DTO, RESPONSE_DTO> {
 
     RESPONSE_DTO save(REQUEST_DTO t);
 
-    Optional<RESPONSE_DTO> findById(Long id);
+    RESPONSE_DTO findById(Long id);
 
     void delete(Long id);
 

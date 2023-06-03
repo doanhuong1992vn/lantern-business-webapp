@@ -1,5 +1,4 @@
 import HttpRequest from '~/utils/HttpRequest';
-import FreeImageUploadRequest from '~/utils/FreeImageUploadRequest';
 
 export const getAll = async () => {
     try {
@@ -18,13 +17,26 @@ export const save = async (product) => {
     }
 }
 
-export const uploadImage = async (formData) => {
+export const update = async (product) => {
     try {
-        return await FreeImageUploadRequest.post('', {
-                body: formData,
-            });
+        return await HttpRequest.put("/products", product);
     } catch (error) {
         console.log(error);
+    }
+}
+
+export const deleteById = async (id) => {
+    try {
+        await HttpRequest.delete(`/products/${id}`);
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+export const deleteByIds = (ids) => {
+    for (let id of ids) {
+        console.log(id)
+        deleteById(id).then().catch(err => console.log(err));
     }
 }
 

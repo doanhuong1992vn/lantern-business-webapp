@@ -8,9 +8,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ProductConverter implements GeneralConverter
-        <Product, ProductResponseDTO, ProductRequestDTO> {
+        <Product, ProductRequestDTO, ProductResponseDTO> {
     @Override
-    public ProductResponseDTO convertToDTO(Product product) {
+    public ProductResponseDTO convertEntityToResponse(Product product) {
         return ProductResponseDTO.builder()
                 .id(product.getId())
                 .name(product.getName())
@@ -20,8 +20,9 @@ public class ProductConverter implements GeneralConverter
     }
 
     @Override
-    public Product convertToEntity(ProductRequestDTO productRequestDTO) {
+    public Product convertRequestToEntity(ProductRequestDTO productRequestDTO) {
         return Product.builder()
+                .id(productRequestDTO.getId())
                 .active(true)
                 .name(productRequestDTO.getName())
                 .image(productRequestDTO.getImage())
@@ -29,4 +30,5 @@ public class ProductConverter implements GeneralConverter
                 .category(productRequestDTO.getCategory())
                 .build();
     }
+
 }

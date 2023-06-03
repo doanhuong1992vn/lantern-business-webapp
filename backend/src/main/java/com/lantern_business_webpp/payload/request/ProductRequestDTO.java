@@ -12,6 +12,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductRequestDTO {
+    private Long id;
     @NotBlank(message = "* Tên sản phẩm không được để trống")
     @Size(max = 50, message = "* Tên sản phẩm không được vượt quá 50 ký tự")
     private String name;

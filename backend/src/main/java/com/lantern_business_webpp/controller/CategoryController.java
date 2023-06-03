@@ -33,23 +33,23 @@ public class CategoryController {
         }
         return new ResponseEntity<>(categories, HttpStatus.OK);
     }
-
-    @GetMapping("/{id}/posts")
-    public ResponseEntity<Page<Product>> findPostsByCategory(
-            @PathVariable Long id,
-            @PageableDefault(size = 2) Pageable pageable) {
-        Optional<Category> optionalCategory = categoryService.findById(id);
-        if (optionalCategory.isPresent()) {
-            Sort sort = Sort.by("name").ascending();
-            Pageable pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
-            Page<Product> products = productService.findByCategory(optionalCategory.get(), pageRequest);
-            if (products.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            } else {
-                return new ResponseEntity<>(products, HttpStatus.OK);
-            }
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
+//
+//    @GetMapping("/{id}/posts")
+//    public ResponseEntity<Page<Product>> findPostsByCategory(
+//            @PathVariable Long id,
+//            @PageableDefault(size = 2) Pageable pageable) {
+//        Optional<Category> optionalCategory = categoryService.findById(id);
+//        if (optionalCategory.isPresent()) {
+//            Sort sort = Sort.by("name").ascending();
+//            Pageable pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+//            Page<Product> products = productService.findByCategory(optionalCategory.get(), pageRequest);
+//            if (products.isEmpty()) {
+//                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+//            } else {
+//                return new ResponseEntity<>(products, HttpStatus.OK);
+//            }
+//        } else {
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//        }
+//    }
 }

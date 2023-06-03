@@ -27,18 +27,12 @@ public class CategoryServiceImpl implements CategoryService {
 
 
     @Override
-    public Optional<Category> findById(Long id) {
-        return categoryRepository.findById(id);
+    public Category findById(Long id) {
+        return categoryRepository.findById(id).orElse(null);
     }
 
     @Override
     public void delete(Long id) {
-        categoryRepository.deleteById(id);
+
     }
-
-//    @Override
-//    public void update(Category category) {
-//        categoryRepository.save(category);
-//    }
-
 }
