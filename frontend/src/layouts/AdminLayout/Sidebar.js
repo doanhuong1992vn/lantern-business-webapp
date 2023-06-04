@@ -1,10 +1,10 @@
 import React, {memo, useState} from "react";
 import styled from "styled-components";
-import { Link } from "react-router-dom";
+import {Link} from "react-router-dom";
 import * as FaIcons from "react-icons/fa";
-import { SidebarData } from "./SidebarData";
+import {SidebarData} from "./SidebarData";
 import SubMenu from "./SubMenu";
-import { IconContext } from "react-icons/lib";
+import {IconContext} from "react-icons/lib";
 
 const Nav = styled.div`
   background: #000000;
@@ -52,18 +52,17 @@ const Sidebar = () => {
 
     return (
         <>
-            <IconContext.Provider value={{ color: "#ffffff" }}>
+            <IconContext.Provider value={{color: "#ffffff"}}>
                 <Nav>
                     <NavIcon to="#">
-                        <FaIcons.FaBars onClick={showSidebar} />
+                        <FaIcons.FaBars onClick={showSidebar}/>
                     </NavIcon>
                     <h1
-                        style={{ textAlign: "center",
-                            marginLeft: "200px",
+                        style={{
                             color: "white",
                             left: '50%',
-                            transform: 'translate(50%, 0)'
-                    }}
+                            transform: 'translate(120%, 0)'
+                        }}
                     >
                         Lantern Business Web Application
                     </h1>
@@ -71,10 +70,10 @@ const Sidebar = () => {
                 <SidebarNav sidebar={sidebar}>
                     <SidebarWrap>
                         <NavIcon to="#">
-                            <FaIcons.FaBars onClick={showSidebar} />
+                            <FaIcons.FaBars onClick={showSidebar}/>
                         </NavIcon>
                         {SidebarData.map((item, index) => {
-                            return <SubMenu item={item} key={index} />;
+                            return <SubMenu item={item} key={index}/>;
                         })}
                     </SidebarWrap>
                 </SidebarNav>

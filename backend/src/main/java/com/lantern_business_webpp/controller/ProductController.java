@@ -6,6 +6,8 @@ import com.lantern_business_webpp.payload.response.ProductResponseDTO;
 import com.lantern_business_webpp.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,9 +26,11 @@ import java.util.List;
 @CrossOrigin("*")
 public class ProductController {
     private final ProductService productService;
+    private final Logger logger = LogManager.getLogger(ProductController.class);
 
     @GetMapping
     public ResponseEntity<?> findAll() {
+//        logger.info("abc");
         List<ProductResponseDTO> products = productService.findByActiveTrue();
         if (products.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -37,10 +41,6 @@ public class ProductController {
     @PostMapping
     public ResponseEntity<?> save(
             @Valid @RequestBody ProductRequestDTO productRequestDTO, BindingResult bindingResult) {
-        if (productService.existsByName(productRequestDTO.getName())) {
-            bindingResult.rejectValue("name", "* Tên sản phẩm đã tồn tại");
-            return new ResponseEntity<>(bindingResult, HttpStatus.BAD_REQUEST);
-        }
         if (bindingResult.hasErrors()) {
             System.out.println(bindingResult);
             return new ResponseEntity<>(bindingResult.getAllErrors(), HttpStatus.BAD_REQUEST);
@@ -57,7 +57,7 @@ public class ProductController {
             return new ResponseEntity<>(bindingResult.getAllErrors(), HttpStatus.BAD_REQUEST);
         }
         ProductResponseDTO productResponseDTO = productService.save(productRequestDTO);
-        return new ResponseEntity<>(productResponseDTO, HttpStatus.CREATED);
+        return new ResponseEntity<>(productResponseDTO, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
@@ -67,7 +67,7 @@ public class ProductController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
             productService.delete(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(HttpStatus.OK);
         }
     }
 

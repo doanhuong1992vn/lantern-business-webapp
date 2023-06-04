@@ -7,7 +7,6 @@ import lombok.*;
 import java.util.Collection;
 
 @Entity
-@Table
 @Getter
 @Setter
 @Builder
@@ -18,7 +17,7 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String name;
     @Column(columnDefinition = "TEXT")
     private String description;

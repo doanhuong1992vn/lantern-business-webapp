@@ -7,8 +7,6 @@ import com.lantern_business_webpp.payload.request.ProductRequestDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
-
 public interface ProductService extends GeneralService<ProductRequestDTO, ProductResponseDTO> {
     Page<Product> findAllWithPagination(Pageable pageable);
 
@@ -16,7 +14,7 @@ public interface ProductService extends GeneralService<ProductRequestDTO, Produc
 
     Page<Product> findAllByNameContaining(String query, Pageable pageRequest);
 
-    boolean existsByName(String name);
+    boolean existsByNameAndActiveTrue(String name);
 
     boolean deleteByIds(Long[] ids);
 }

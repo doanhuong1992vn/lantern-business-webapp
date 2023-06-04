@@ -2,8 +2,11 @@ package com.lantern_business_webpp;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 @SpringBootApplication
+@EnableAspectJAutoProxy
+//@Import(Log4j2Config.class)
 public class BackendApplication {
 
 	public static void main(String[] args) {

@@ -2,7 +2,7 @@ import HttpRequest from '~/utils/HttpRequest';
 
 export const getAll = async () => {
     try {
-        console.log('HttpRequest call get()')
+        console.log('Get all categories')
         return await HttpRequest.get('/categories');
     } catch (error) {
         console.log(error);

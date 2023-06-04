@@ -82,8 +82,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public boolean existsByName(String name) {
-        return productRepository.existsByName(name);
+    public boolean existsByNameAndActiveTrue(String name) {
+        return productRepository.existsByNameAndActiveTrue(name);
     }
 
     @Override

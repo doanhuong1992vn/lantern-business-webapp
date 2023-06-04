@@ -23,4 +23,6 @@ public interface ProductRepository extends
     List<Product> findByActiveTrue();
 
     boolean existsByName(String name);
+
+    boolean existsByNameAndActiveTrue(String name);
 }
