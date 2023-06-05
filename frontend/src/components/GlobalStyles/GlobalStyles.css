@@ -3,13 +3,14 @@ html {
 }
 
 body {
-    font-family: var(--font-family);
+    font-family: var(--font-family), Roboto, Helvetica, Arial, sans-serif;
     font-weight: normal;
     /*background: var(--surface-ground);*/
     background-color: #afb8b9;
     color: var(--text-color);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /*font-family: Roboto, Helvetica, Arial, sans-serif;*/
 }
 
 .card {

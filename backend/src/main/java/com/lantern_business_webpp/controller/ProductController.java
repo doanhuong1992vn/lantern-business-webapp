@@ -4,7 +4,7 @@ import com.lantern_business_webpp.entity.Product;
 import com.lantern_business_webpp.payload.request.ProductRequestDTO;
 import com.lantern_business_webpp.payload.response.ProductResponseDTO;
 import com.lantern_business_webpp.service.ProductService;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

@@ -6,6 +6,8 @@ import "primereact/resources/primereact.min.css";
 import 'primeicons/primeicons.css';                                 // icons
 import 'primeflex/primeflex.css';                                   // css utility
 import '~/flags.css';
+import 'mdb-react-ui-kit/dist/css/mdb.min.css';                     //mdb react
+import "@fortawesome/fontawesome-free/css/all.min.css";             //mdb react - font
 
 import App from '~/App';
 import reportWebVitals from './reportWebVitals';

@@ -1,9 +1,9 @@
 package com.lantern_business_webpp.payload.request;
 
 import com.lantern_business_webpp.entity.Category;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import lombok.*;
 
 @Builder

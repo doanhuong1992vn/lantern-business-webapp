@@ -3,7 +3,7 @@ import HttpRequest from '~/utils/HttpRequest';
 export const getAll = async () => {
     try {
         console.log('HttpRequest call get all products')
-        return await HttpRequest.get('/products');
+        return await HttpRequest.get('/admin/products');
     } catch (error) {
         console.log(error);
     }
@@ -12,7 +12,7 @@ export const getAll = async () => {
 export const save = async (product) => {
     try {
         console.log('HttpRequest call save product')
-        return await HttpRequest.post("/products", product);
+        return await HttpRequest.post("/admin/products", product);
     } catch (error) {
         console.log(error);
     }
@@ -21,7 +21,7 @@ export const save = async (product) => {
 export const update = async (product) => {
     try {
         console.log('HttpRequest call update product')
-        return await HttpRequest.put("/products", product);
+        return await HttpRequest.put("/admin/products", product);
     } catch (error) {
         console.log(error);
     }
@@ -30,7 +30,7 @@ export const update = async (product) => {
 export const deleteById = async (id) => {
     try {
         console.log('HttpRequest call delete 1 product')
-        await HttpRequest.delete(`/products/${id}`);
+        await HttpRequest.delete(`/admin/products/${id}`);
     } catch (error) {
         console.log(error);
     }
