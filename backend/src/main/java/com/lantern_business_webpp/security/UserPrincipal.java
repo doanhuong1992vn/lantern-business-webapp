@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 public class UserPrincipal implements UserDetails {
     private static final long serialVersionUID = 1L;
 
-    private Integer id;
+    private Long id;
     private String username;
 
     @JsonIgnore
@@ -22,7 +22,7 @@ public class UserPrincipal implements UserDetails {
 
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserPrincipal(Integer id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
+    public UserPrincipal(Long id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -42,7 +42,7 @@ public class UserPrincipal implements UserDetails {
         );
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 

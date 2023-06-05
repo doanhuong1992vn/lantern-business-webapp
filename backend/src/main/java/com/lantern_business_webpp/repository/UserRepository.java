@@ -9,17 +9,23 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Integer> {
+public interface UserRepository extends JpaRepository<User, Long> {
     User findByUsername(String username);
 
     @Query(nativeQuery = true, value = "select * " +
-            "from users u " +
+            "from user u " +
             "where u.fullname like (:fullname);")
     List<User> findByFullName(@Param("fullname") String fullname);
 
     @Query(nativeQuery = true,
-            value = "SELECT r.name FROM roles r " +
-                    "INNER JOIN users u ON r.id = u.role_id " +
+            value = "SELECT r.name FROM role r " +
+                    "INNER JOIN user u ON r.id = u.role_id " +
                     "WHERE u.username = :username")
     List<String> findRolesByUsername(@Param("username") String username);
+
+    boolean existsByUsername(String username);
+
+    boolean existsByEmail(String email);
+
+    boolean existsByPhone(String phone);
 }

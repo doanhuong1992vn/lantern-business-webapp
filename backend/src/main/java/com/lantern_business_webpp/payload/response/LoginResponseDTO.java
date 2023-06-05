@@ -4,7 +4,7 @@ import javax.validation.constraints.NotBlank;
 import org.springframework.lang.Nullable;
 
 
-public class LoginResponse {
+public class LoginResponseDTO {
 
     @NotBlank
     private String message;
@@ -12,11 +12,11 @@ public class LoginResponse {
     @Nullable
     private String token;
 
-    public LoginResponse() {
+    public LoginResponseDTO() {
         super();
     }
 
-    public LoginResponse(@NotBlank String message, String token) {
+    public LoginResponseDTO(@NotBlank String message, String token) {
         super();
         this.message = message;
         this.token = token;

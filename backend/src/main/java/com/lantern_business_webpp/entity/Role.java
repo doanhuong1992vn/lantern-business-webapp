@@ -16,12 +16,8 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
-
-    @NotBlank
     @Column(name = "name", length = 50, nullable = false)
     private String name;
-
-    @NotBlank
     @Column(name = "description", length = 100, nullable = false)
-    private String desc;
+    private String description;
 }

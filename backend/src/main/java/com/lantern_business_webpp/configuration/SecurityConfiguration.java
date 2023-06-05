@@ -98,15 +98,15 @@ public class SecurityConfiguration {
         // If not login at admin role yet, redirect to /login
         httpSecurity.authorizeHttpRequests()
                 .antMatchers("/api/user/**")
-                .hasAnyRole("ADMIN", "USER");
+                .hasAnyRole("ADMIN", "CUSTOMER");
 
-        // Pages require login with role: ROLE_USER
+        // Pages require login with role: ROLE_CUSTOMER
         // If not login at user role yet, redirect to /login
         httpSecurity.authorizeHttpRequests()
                 .antMatchers("/api/admin/**")
                 .hasRole("ADMIN");
 
-        // When user login with ROLE_USER, but try to
+        // When user login with ROLE_CUSTOMER, but try to
         // access pages require ROLE_ADMIN, redirect to /error-403
         httpSecurity.authorizeHttpRequests().and().exceptionHandling()
                 .accessDeniedPage("/api/access-denied");

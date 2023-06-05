@@ -1,6 +1,6 @@
 package com.lantern_business_webpp.controller;
 
-import com.lantern_business_webpp.payload.UserDto;
+import com.lantern_business_webpp.payload.response.UserResponseDto;
 import com.lantern_business_webpp.service.SecurityService;
 import com.lantern_business_webpp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,24 +26,24 @@ public class UserController {
         if (!securityService.isAuthenticated() && !securityService.isValidToken(authToken)) {
             return new ResponseEntity<String>("Responding with unauthorized error. Message - {}", HttpStatus.UNAUTHORIZED);
         }
-        List<UserDto> userDtos = userService.getUsers();
-        if (userDtos.isEmpty()) {
-            return new ResponseEntity<List<UserDto>>(HttpStatus.NO_CONTENT);
+        List<UserResponseDto> userResponseDtos = userService.getUsers();
+        if (userResponseDtos.isEmpty()) {
+            return new ResponseEntity<List<UserResponseDto>>(HttpStatus.NO_CONTENT);
         }
-        return new ResponseEntity<>(userDtos, HttpStatus.OK);
+        return new ResponseEntity<>(userResponseDtos, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getOne(@PathVariable("id") Integer id,
+    public ResponseEntity<?> getOne(@PathVariable("id") Long id,
                                     @RequestHeader("Authorization") final String authToken) {
         if (!securityService.isAuthenticated() && !securityService.isValidToken(authToken)) {
             return new ResponseEntity<String>("Responding with unauthorized error. Message - {}", HttpStatus.UNAUTHORIZED);
         }
-        UserDto userDto = userService.getUserById(id);
-        if (userDto == null) {
-            return new ResponseEntity<UserDto>(HttpStatus.NOT_FOUND);
+        UserResponseDto userResponseDto = userService.getUserById(id);
+        if (userResponseDto == null) {
+            return new ResponseEntity<UserResponseDto>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(userDto, HttpStatus.OK);
+        return new ResponseEntity<>(userResponseDto, HttpStatus.OK);
     }
 
 //    @PostMapping("/search")
@@ -52,11 +52,11 @@ public class UserController {
 //        if (!securityService.isAuthenticated() && !securityService.isValidToken(authToken)) {
 //            return new ResponseEntity<String>("Responding with unauthorized error. Message - {}", HttpStatus.UNAUTHORIZED);
 //        }
-//        List<UserDto> userDtos = null;
+//        List<UserResponseDto> userDtos = null;
 //        if (searchRequest.getKeyword() != null && !searchRequest.getKeyword().isEmpty()) {
 //            userDtos = userService.getUsersByFullName(searchRequest.getKeyword());
 //            if (userDtos.isEmpty()) {
-//                return new ResponseEntity<List<UserDto>>(HttpStatus.NO_CONTENT);
+//                return new ResponseEntity<List<UserResponseDto>>(HttpStatus.NO_CONTENT);
 //            }
 //        }
 //        return new ResponseEntity<>(userDtos, HttpStatus.OK);

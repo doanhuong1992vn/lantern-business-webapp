@@ -1,7 +1,5 @@
 package com.lantern_business_webpp.exception;
 
-import lombok.Getter;
-
 import java.util.Date;
 
 

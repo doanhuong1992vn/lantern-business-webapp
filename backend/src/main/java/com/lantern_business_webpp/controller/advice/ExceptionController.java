@@ -1,5 +1,6 @@
 package com.lantern_business_webpp.controller.advice;
 
+import com.lantern_business_webpp.exception.DuplicateFieldUserException;
 import com.lantern_business_webpp.exception.ErrorDetails;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -21,14 +22,6 @@ public class ExceptionController extends ResponseEntityExceptionHandler {
         );
         return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
     }
-//
-//    @ExceptionHandler(NoHandlerFoundException.class)
-//    public ResponseEntity<?> handleException(Exception ex) {
-//        ErrorDetails errorDetails = new ErrorDetails(
-//                new Date(), ex.getMessage(), ex.getCause().toString()
-//        );
-//        return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
-//    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleAllException(Exception ex, WebRequest request) {
@@ -36,5 +29,13 @@ public class ExceptionController extends ResponseEntityExceptionHandler {
                 new Date(), ex.getMessage(), request.getDescription(false)
         );
         return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(DuplicateFieldUserException.class)
+    public ResponseEntity<?> handleDuplicateFieldUserException(DuplicateFieldUserException ex, WebRequest request) {
+        ErrorDetails errorDetails = new ErrorDetails(
+                new Date(), ex.getMessage(), request.getDescription(false)
+        );
+        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
     }
 }

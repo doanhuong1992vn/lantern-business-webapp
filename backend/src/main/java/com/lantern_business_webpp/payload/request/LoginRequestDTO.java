@@ -3,7 +3,7 @@ package com.lantern_business_webpp.payload.request;
 
 import javax.validation.constraints.NotBlank;
 
-public class LoginRequest {
+public class LoginRequestDTO {
 
     @NotBlank
     private String username;

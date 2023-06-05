@@ -2,7 +2,7 @@ package com.lantern_business_webpp.service.impl;
 
 
 import com.lantern_business_webpp.entity.Role;
-import com.lantern_business_webpp.payload.RoleDto;
+import com.lantern_business_webpp.payload.response.RoleResponseDto;
 import com.lantern_business_webpp.repository.RoleRepository;
 import com.lantern_business_webpp.service.RoleService;
 import javax.transaction.Transactional;
@@ -28,22 +28,22 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public Iterable<RoleDto> findAll() {
+    public Iterable<RoleResponseDto> findAll() {
         Iterable<Role> entities = roleRepository.findAll();
         return StreamSupport.stream(entities.spliterator(), true)
-                            .map(entity -> modelMapper.map(entity, RoleDto.class))
+                            .map(entity -> modelMapper.map(entity, RoleResponseDto.class))
                             .collect(Collectors.toList());
     }
 
     @Override
-    public Optional<RoleDto> findById(Long id) {
+    public Optional<RoleResponseDto> findById(Long id) {
         Role entity = roleRepository.findById(id).orElse(null);
-        return Optional.ofNullable(modelMapper.map(entity, RoleDto.class));
+        return Optional.ofNullable(modelMapper.map(entity, RoleResponseDto.class));
     }
 
     @Override
-    public void save(RoleDto roleDto) {
-        Role role = modelMapper.map(roleDto, Role.class);
+    public void save(RoleResponseDto roleResponseDto) {
+        Role role = modelMapper.map(roleResponseDto, Role.class);
         roleRepository.save(role);
     }
 

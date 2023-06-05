@@ -1,6 +1,6 @@
-package com.lantern_business_webpp.payload;
+package com.lantern_business_webpp.payload.response;
 
-public class UserDto {
+public class UserResponseDto {
 
     private Long id;
     private String fullName;
@@ -13,12 +13,12 @@ public class UserDto {
     private Boolean activated;
     private String rememberToken;
 
-    public UserDto() {
+    public UserResponseDto() {
     }
 
-    public UserDto(Long id, String fullName, String username, String email,
-                   String password, String address, String phone, String avatar,
-                   Boolean activated, String rememberToken) {
+    public UserResponseDto(Long id, String fullName, String username, String email,
+                           String password, String address, String phone, String avatar,
+                           Boolean activated, String rememberToken) {
         this.id = id;
         this.fullName = fullName;
         this.username = username;
@@ -31,8 +31,8 @@ public class UserDto {
         this.rememberToken = rememberToken;
     }
 
-    public UserDto(String fullName, String username, String email, String password, String address,
-                   String phone, String avatar, Boolean activated, String rememberToken) {
+    public UserResponseDto(String fullName, String username, String email, String password, String address,
+                           String phone, String avatar, Boolean activated, String rememberToken) {
         super();
         this.fullName = fullName;
         this.username = username;

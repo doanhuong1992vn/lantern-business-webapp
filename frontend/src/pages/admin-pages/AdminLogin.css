@@ -9,7 +9,7 @@
     background: linear-gradient(to right, #ee7724, #d8363a, #dd3675, #b44593);
 }
 body {
-    background-color: #f7dff1 !important;
+    background-color: #f2e7ef !important;
 }
 @media (min-width: 768px) {
     .gradient-form {
