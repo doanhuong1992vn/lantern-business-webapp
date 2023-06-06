@@ -1,12 +1,21 @@
 import React, {useContext, useState} from 'react';
 import {
-    MDBBtn, MDBContainer, MDBRow, MDBCol, MDBInput, MDBTabs, MDBTabsItem,
-    MDBTabsLink, MDBTabsContent, MDBTabsPane, MDBIcon, MDBCheckbox
-}
-    from 'mdb-react-ui-kit';
+    MDBBtn,
+    MDBCheckbox,
+    MDBCol,
+    MDBContainer,
+    MDBIcon,
+    MDBInput,
+    MDBRow,
+    MDBTabs,
+    MDBTabsContent,
+    MDBTabsItem,
+    MDBTabsLink,
+    MDBTabsPane
+} from 'mdb-react-ui-kit';
 import './AdminLogin.css';
 import * as userService from "~/services/UserService";
-import AuthContext from "~/security/AuthContext";
+import AuthContext from "~/security/AuthContext"
 
 const AdminLogin = () => {
     let newLoginRequest = {
@@ -17,19 +26,23 @@ const AdminLogin = () => {
         fullName: '',
         username: '',
         email: '',
+        phone: '',
         password: '',
         repeatPassword: '',
     }
 
-    const [loginRequest, setLoginRequest] = useState(newLoginRequest);
-    const [registerRequest, setRegisterRequest] = useState(newRegisterRequest);
+    const [loginRequest, setLoginRequest] = useState(() => newLoginRequest);
+    const [registerRequest, setRegisterRequest] = useState(() => newRegisterRequest);
     const [justifyActive, setJustifyActive] = useState('loginTab');
-    const { login } = useContext(AuthContext);
+    const [messageResponse, setMessageResponse] = useState('');
+    const {user, login} = useContext(AuthContext);
+
 
     const handleJustifyClick = (value) => {
         if (value === justifyActive) {
             return;
         }
+        setMessageResponse('');
         setJustifyActive(value);
     };
 
@@ -42,7 +55,15 @@ const AdminLogin = () => {
     }
 
     const handleOnClickSignIn = async () => {
-        await login(loginRequest);
+        try {
+            await login(loginRequest);
+            setLoginRequest(newLoginRequest);
+            if (!user) {
+                setMessageResponse("Đăng nhập thất bại! Vui lòng nhập lại thông tin!")
+            }
+        } catch (err) {
+
+        }
     }
 
     const handleChangeInputRegister = (e, field) => {
@@ -52,10 +73,26 @@ const AdminLogin = () => {
         setRegisterRequest(newRegisterRequest);
     }
 
-    const handleClickSignUp = () => {
-        userService.register(registerRequest)
-            .then()
-            .catch();
+    const handleClickSignUp = async () => {
+        const newUser = {
+            fullName: registerRequest.fullName,
+            username: registerRequest.username,
+            email: registerRequest.email,
+            phone: registerRequest.phone,
+            password: registerRequest.password
+        }
+        await userService.register(newUser)
+            .then((response) => {
+                if (response && response.status === 201) {
+                    setMessageResponse(response.data.message);
+                    setJustifyActive("loginTab")
+                    setRegisterRequest(newRegisterRequest);
+                }
+            })
+            .catch(error => {
+                console.log(error)
+                setMessageResponse("Đăng ký thất bại! Vui lòng nhập lại thông tin!");
+            });
     }
 
     return (
@@ -117,6 +154,7 @@ const AdminLogin = () => {
                                                      label='Remember me'/>
                                         <a href="#!">Forgot password?</a>
                                     </div>
+                                    <p className="text-center text-primary">{messageResponse}</p>
                                     <MDBBtn onClick={handleOnClickSignIn} className="mb-4 w-100 gradient-custom-2">
                                         Sign in
                                     </MDBBtn>
@@ -153,10 +191,13 @@ const AdminLogin = () => {
                                               wrapperClass='mb-4' label='Username' type='text'/>
                                     <MDBInput onChange={(event) => handleChangeInputRegister(event, "email")}
                                               wrapperClass='mb-4' label='Email' type='email'/>
+                                    <MDBInput onChange={(event) => handleChangeInputRegister(event, "phone")}
+                                              wrapperClass='mb-4' label='Phone' type='text'/>
                                     <MDBInput onChange={(event) => handleChangeInputRegister(event, "password")}
                                               wrapperClass='mb-4' label='Password' type='password'/>
                                     <MDBInput onChange={(event) => handleChangeInputRegister(event, "repeatPassword")}
                                               wrapperClass='mb-4' label='Repeat Password' type='password'/>
+                                    <p className="text-center text-primary">{messageResponse}</p>
                                     <MDBBtn onClick={handleClickSignUp} className="mb-4 w-100 gradient-custom-2 mt-3">
                                         Sign up
                                     </MDBBtn>

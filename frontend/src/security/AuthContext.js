@@ -14,19 +14,14 @@ export const AuthContextProvider = ({ children }) => {
     });
     const navigate = useNavigate();
     const login = async (loginRequest) => {
-        await axios.post("http://localhost:8080/api/login", loginRequest, {
-            // withCredentials: true,
-        }).then(response => {
+        await axios.post("http://localhost:8080/api/login", loginRequest).then(response => {
             if (response.status === 200) {
+                console.log(response.data.name + " đã đăng nhập thành công!")
                 localStorage.setItem("userProfile", JSON.stringify(response.data));
                 setUser(response.data);
                 navigate("/");
             }
-        }).catch(error => console.log(error));
-        // let apiResponse = await axios.get("http://localhost:4000/user-profile", {
-        //     withCredentials: true,
-        // });
-
+        }).catch(error => console.log("Axios lỗi đăng nhập: " + error));
     };
     return (
         <>

@@ -15,6 +15,7 @@ import java.util.Set;
 @Setter
 public class LoginResponseDTO {
     private String message;
+    private String name;
     private Set<Role> roles;
     @Nullable
     private String token;

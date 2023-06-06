@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import {classNames} from 'primereact/utils';
 import {DataTable} from 'primereact/datatable';
 import {Column} from 'primereact/column';
@@ -17,6 +17,7 @@ import {getDownloadURL, ref, uploadBytesResumable} from "firebase/storage";
 import * as productService from '~/services/ProductService'
 import * as categoryService from "~/services/CategoryService";
 import {useNavigate} from "react-router-dom";
+import AuthContext from "~/security/AuthContext";
 
 const Products = () => {
     let newProduct = {
@@ -31,7 +32,7 @@ const Products = () => {
     const [productDialog, setProductDialog] = useState(false);
     const [deleteProductDialog, setDeleteProductDialog] = useState(false);
     const [deleteProductListDialog, setDeleteProductListDialog] = useState(false);
-    const [product, setProduct] = useState(newProduct);
+    const [product, setProduct] = useState(() => newProduct);
     const [selectedProductList, setSelectedProductList] = useState(null);
     const [submitted, setSubmitted] = useState(false);
     const [globalFilter, setGlobalFilter] = useState(null);
@@ -42,15 +43,20 @@ const Products = () => {
     const toast = useRef(null);
     const dt = useRef(null);
     const navigate = useNavigate();
+    const { user } = useContext(AuthContext);
 
     useEffect(() => {
-        productService.getAll()
-            .then((response) => setProductList(response.data))
-            .catch((error) => /*navigate("/error-403")*/console.log(error));
-        categoryService.getAll()
-            .then((response) => setCategories(response.data))
-            .catch((error) => /*navigate("/error-403")*/console.log(error));
-    }, []);
+        if (!user) {
+            navigate("/error-403");
+        } else {
+            productService.getAll(user.token)
+                .then((response) => setProductList(response.data))
+                .catch((error) => /*navigate("/error-403")*/console.log(error));
+            categoryService.getAll(user.token)
+                .then((response) => setCategories(response.data))
+                .catch((error) => /*navigate("/error-403")*/console.log(error));
+        }
+    }, [user]);
 
     const exportCSV = () => {
         dt.current.exportCSV();
@@ -150,7 +156,7 @@ const Products = () => {
     };
 
     function saveProduct(_product, _productList) {
-        productService.save(_product)
+        productService.save(_product, user.token)
             .then((response) => {
                 setProduct(response.data)
                 _productList.unshift(response.data);
@@ -165,7 +171,7 @@ const Products = () => {
     }
 
     function updateProduct(_product, _productList) {
-        productService.update(_product)
+        productService.update(_product, user.token)
             .then((response) => {
                 setProduct(response.data)
                 const index = findIndexById(product.id);
@@ -196,7 +202,7 @@ const Products = () => {
     };
 
     const handleDeleteProduct = () => {
-        productService.deleteById(product.id).then().catch(err => console.log(err));
+        productService.deleteById(product.id, user.token).then().catch(err => console.log(err));
         let _products = productList.filter((val) => val.id !== product.id);
         setProductList(_products);
         setDeleteProductDialog(false);
@@ -220,7 +226,7 @@ const Products = () => {
         let ids = [];
         selectedProductList.map(item => ids.push(item.id));
         console.log(ids);
-        productService.deleteByIds(ids);
+        productService.deleteByIds(ids, user.token);
         let _products = productList.filter((val) => !selectedProductList.includes(val));
         setProductList(_products);
         setDeleteProductListDialog(false);

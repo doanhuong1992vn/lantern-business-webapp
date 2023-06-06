@@ -1,18 +1,29 @@
 import HttpRequest from '~/utils/HttpRequest';
 
-export const getAll = async () => {
+
+export const getAll = async (token) => {
+
     try {
-        console.log('Get all categories')
-        return await HttpRequest.get('/admin/categories');
+        return await HttpRequest.get('/admin/categories', {
+            "headers" : {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
     } catch (error) {
-        console.log(error);
+        console.log("Axios lỗi getAll categories :" + error);
     }
 };
 
-export const save = async (category) => {
+export const save = async (category, token) => {
     try {
-        return await HttpRequest.post("/admin/categories", category);
+        return await HttpRequest.post("/admin/categories", category, {
+            "headers" : {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
     } catch (error) {
-        console.log(error);
+        console.log("Axios lỗi save category :" + error);
     }
 }

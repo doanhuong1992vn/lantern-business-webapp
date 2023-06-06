@@ -48,7 +48,8 @@ public class AuthController {
             String token = tokenProvider.generateToken(authentication);
             User user = userService.findByUsername(loginRequestDTO.getUsername());
             return new ResponseEntity<>(new LoginResponseDTO(
-                    "Đăng nhập thành công!", user.getRoles(), token), HttpStatus.OK);
+                    "Đăng nhập thành công!", user.getFullName(), user.getRoles(), token),
+                    HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(new LoginResponseDTO(
@@ -72,7 +73,7 @@ public class AuthController {
             //501 Not Implemented: Server không công nhận các Request method hoặc không có khả năng xử lý nó.
         }
         return new ResponseEntity<>(new MessageResponseDTO(
-                String.format("%s tạo tài khoản thành công với username %s",
+                String.format("Chúc mừng %s đã tạo tài khoản thành công với username %s",
                         registerRequestDTO.getFullName(), registerRequestDTO.getUsername())),
                 HttpStatus.CREATED);
     }
