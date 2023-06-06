@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin(value = "*", maxAge = 3600)
+@CrossOrigin("*")
 @RequestMapping("/api")
 public class AuthController {
 
@@ -46,10 +46,13 @@ public class AuthController {
 
             // Gọi hàm tạo Token
             String token = tokenProvider.generateToken(authentication);
-            return new ResponseEntity<>(new LoginResponseDTO("Đăng nhập thành công!", token), HttpStatus.OK);
+            User user = userService.findByUsername(loginRequestDTO.getUsername());
+            return new ResponseEntity<>(new LoginResponseDTO(
+                    "Đăng nhập thành công!", user.getRoles(), token), HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<>(new LoginResponseDTO("Đăng nhập thất bại!", null), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new LoginResponseDTO(
+                    "Đăng nhập thất bại!", null), HttpStatus.BAD_REQUEST);
         }
     }
 

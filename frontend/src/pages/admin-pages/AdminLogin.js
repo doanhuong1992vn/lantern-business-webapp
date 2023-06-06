@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {
     MDBBtn, MDBContainer, MDBRow, MDBCol, MDBInput, MDBTabs, MDBTabsItem,
     MDBTabsLink, MDBTabsContent, MDBTabsPane, MDBIcon, MDBCheckbox
@@ -6,6 +6,7 @@ import {
     from 'mdb-react-ui-kit';
 import './AdminLogin.css';
 import * as userService from "~/services/UserService";
+import AuthContext from "~/security/AuthContext";
 
 const AdminLogin = () => {
     let newLoginRequest = {
@@ -23,6 +24,7 @@ const AdminLogin = () => {
     const [loginRequest, setLoginRequest] = useState(newLoginRequest);
     const [registerRequest, setRegisterRequest] = useState(newRegisterRequest);
     const [justifyActive, setJustifyActive] = useState('loginTab');
+    const { login } = useContext(AuthContext);
 
     const handleJustifyClick = (value) => {
         if (value === justifyActive) {
@@ -39,10 +41,8 @@ const AdminLogin = () => {
         setLoginRequest(newLoginRequest);
     }
 
-    const handleOnClickSignIn = () => {
-        userService.login(loginRequest)
-            .then()
-            .catch();
+    const handleOnClickSignIn = async () => {
+        await login(loginRequest);
     }
 
     const handleChangeInputRegister = (e, field) => {
@@ -86,48 +86,37 @@ const AdminLogin = () => {
                                     </MDBTabsLink>
                                 </MDBTabsItem>
                             </MDBTabs>
-
                             <MDBTabsContent>
-
                                 <MDBTabsPane show={justifyActive === 'loginTab'}>
-
                                     <div className="text-center mb-3">
                                         <p>Sign in with:</p>
-
                                         <div className='d-flex justify-content-between mx-auto' style={{width: '50%'}}>
                                             <MDBBtn tag='a' color='none' className='m-1' style={{color: '#1266f1'}}>
                                                 <MDBIcon fab icon='facebook-f' size="sm"/>
                                             </MDBBtn>
-
                                             <MDBBtn tag='a' color='none' className='m-1' style={{color: '#1266f1'}}>
                                                 <MDBIcon fab icon='twitter' size="sm"/>
                                             </MDBBtn>
-
                                             <MDBBtn tag='a' color='none' className='m-1' style={{color: '#1266f1'}}>
                                                 <MDBIcon fab icon='google' size="sm"/>
                                             </MDBBtn>
-
                                             <MDBBtn tag='a' color='none' className='m-1' style={{color: '#1266f1'}}>
                                                 <MDBIcon fab icon='github' size="sm"/>
                                             </MDBBtn>
                                         </div>
-
                                         <p className="text-center mt-3">or:</p>
                                     </div>
-
                                     <MDBInput onChange={(e) => handleChangeInputLogin(e, "username")}
                                               value={loginRequest.username}
-                                              wrapperClass='mb-4' label='Username' id='form1' type='text'/>
+                                              wrapperClass='mb-4' label='Username' type='text'/>
                                     <MDBInput onChange={(e) => handleChangeInputLogin(e, "password")}
                                               value={loginRequest.password}
-                                              wrapperClass='mb-4' label='Password' id='form2' type='password'/>
-
+                                              wrapperClass='mb-4' label='Password' type='password'/>
                                     <div className="d-flex justify-content-between mx-4 mb-4">
                                         <MDBCheckbox name='flexCheck' value='' id='flexCheckDefault'
                                                      label='Remember me'/>
                                         <a href="#!">Forgot password?</a>
                                     </div>
-
                                     <MDBBtn onClick={handleOnClickSignIn} className="mb-4 w-100 gradient-custom-2">
                                         Sign in
                                     </MDBBtn>
@@ -137,69 +126,45 @@ const AdminLogin = () => {
                                             Register
                                         </MDBBtn>
                                     </p>
-
                                 </MDBTabsPane>
 
                                 <MDBTabsPane show={justifyActive === 'registerTab'}>
-
                                     <div className="text-center mb-3">
                                         <p>Sign up with:</p>
-
                                         <div className='d-flex justify-content-between mx-auto' style={{width: '50%'}}>
                                             <MDBBtn tag='a' color='none' className='m-1' style={{color: '#1266f1'}}>
                                                 <MDBIcon fab icon='facebook-f' size="sm"/>
                                             </MDBBtn>
-
                                             <MDBBtn tag='a' color='none' className='m-1' style={{color: '#1266f1'}}>
                                                 <MDBIcon fab icon='twitter' size="sm"/>
                                             </MDBBtn>
-
                                             <MDBBtn tag='a' color='none' className='m-1' style={{color: '#1266f1'}}>
                                                 <MDBIcon fab icon='google' size="sm"/>
                                             </MDBBtn>
-
                                             <MDBBtn tag='a' color='none' className='m-1' style={{color: '#1266f1'}}>
                                                 <MDBIcon fab icon='github' size="sm"/>
                                             </MDBBtn>
                                         </div>
-
                                         <p className="text-center mt-3">or:</p>
                                     </div>
-
                                     <MDBInput onChange={(event) => handleChangeInputRegister(event, "fullName")}
-                                              wrapperClass='mb-4' label='Full Name' id='form1' type='text'/>
+                                              wrapperClass='mb-4' label='Full Name' type='text'/>
                                     <MDBInput onChange={(event) => handleChangeInputRegister(event, "username")}
-                                              wrapperClass='mb-4' label='Username' id='form1' type='text'/>
+                                              wrapperClass='mb-4' label='Username' type='text'/>
                                     <MDBInput onChange={(event) => handleChangeInputRegister(event, "email")}
-                                              wrapperClass='mb-4' label='Email' id='form1' type='email'/>
+                                              wrapperClass='mb-4' label='Email' type='email'/>
                                     <MDBInput onChange={(event) => handleChangeInputRegister(event, "password")}
-                                              wrapperClass='mb-4' label='Password' id='form1' type='password'/>
+                                              wrapperClass='mb-4' label='Password' type='password'/>
                                     <MDBInput onChange={(event) => handleChangeInputRegister(event, "repeatPassword")}
-                                              wrapperClass='mb-4' label='Repeat Password' id='form1' type='password'/>
-
-                                    <MDBBtn onClick={handleClickSignUp} className="mb-4 w-100 gradient-custom-2 mt-3">Sign up</MDBBtn>
-
+                                              wrapperClass='mb-4' label='Repeat Password' type='password'/>
+                                    <MDBBtn onClick={handleClickSignUp} className="mb-4 w-100 gradient-custom-2 mt-3">
+                                        Sign up
+                                    </MDBBtn>
                                 </MDBTabsPane>
-
                             </MDBTabsContent>
-
                         </MDBContainer>
                     </div>
                 </MDBCol>
-
-                {/*<MDBCol col='6' className="mb-5">*/}
-                {/*    <div className="d-flex flex-column  justify-content-center gradient-custom-2 h-100 mb-4">*/}
-                {/*        <div className="text-white px-3 py-4 p-md-5 mx-md-4">*/}
-                {/*            <h4 className="mb-4">We are more than just a company</h4>*/}
-                {/*            <p className="small mb-0">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do*/}
-                {/*                eiusmod*/}
-                {/*                tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis*/}
-                {/*                nostrud*/}
-                {/*                exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.*/}
-                {/*            </p>*/}
-                {/*        </div>*/}
-                {/*    </div>*/}
-                {/*</MDBCol>*/}
             </MDBRow>
 
         </MDBContainer>

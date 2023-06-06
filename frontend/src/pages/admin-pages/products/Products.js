@@ -16,6 +16,7 @@ import {getDownloadURL, ref, uploadBytesResumable} from "firebase/storage";
 
 import * as productService from '~/services/ProductService'
 import * as categoryService from "~/services/CategoryService";
+import {useNavigate} from "react-router-dom";
 
 const Products = () => {
     let newProduct = {
@@ -40,14 +41,15 @@ const Products = () => {
 
     const toast = useRef(null);
     const dt = useRef(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         productService.getAll()
             .then((response) => setProductList(response.data))
-            .catch((error) => console.log(error));
+            .catch((error) => /*navigate("/error-403")*/console.log(error));
         categoryService.getAll()
             .then((response) => setCategories(response.data))
-            .catch((error) => console.log(error));
+            .catch((error) => /*navigate("/error-403")*/console.log(error));
     }, []);
 
     const exportCSV = () => {

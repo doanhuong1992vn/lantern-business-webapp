@@ -30,7 +30,6 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<?> findAll() {
-//        logger.info("abc");
         List<ProductResponseDTO> products = productService.findByActiveTrue();
         if (products.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);

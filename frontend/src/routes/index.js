@@ -4,13 +4,15 @@ import Dashboard from '~/pages/admin-pages/Dashboard';
 import Categories from '~/pages/admin-pages/Categories';
 import Products from '~/pages/admin-pages/products/Products';
 import ImportProduct from '~/pages/admin-pages/products/ImportProduct';
+import Home from "~/pages/customer-pages/Home";
 
 const publicRoutes = [
 
 ]
 
 const privateRoutes = [
-    { path: '/', component: AdminLogin, layout: null},
+    { path: '/', component: Home, layout: null},
+    { path: '/login', component: AdminLogin, layout: null},
     { path: '/admin/about-us', component: AboutUs},
     { path: '/admin/dashboard', component: Dashboard},
     { path: '/admin/categories', component: Categories},

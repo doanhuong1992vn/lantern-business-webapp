@@ -1,40 +1,26 @@
 package com.lantern_business_webpp.payload.response;
 
-import javax.validation.constraints.NotBlank;
+import com.lantern_business_webpp.entity.Role;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.lang.Nullable;
 
+import java.util.Set;
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 public class LoginResponseDTO {
-
-    @NotBlank
     private String message;
-
+    private Set<Role> roles;
     @Nullable
     private String token;
 
-    public LoginResponseDTO() {
-        super();
-    }
-
-    public LoginResponseDTO(@NotBlank String message, String token) {
-        super();
+    public LoginResponseDTO(String message, String token) {
         this.message = message;
-        this.token = token;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
         this.token = token;
     }
 }
