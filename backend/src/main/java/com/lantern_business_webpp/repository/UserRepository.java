@@ -12,22 +12,22 @@ import java.util.List;
 public interface UserRepository extends JpaRepository<User, Long> {
     User findByUsername(String username);
 
-    @Query(nativeQuery = true, value = "select * " +
+    @Query(nativeQuery = true,
+            value = "select * " +
             "from user u " +
-            "where u.fullname like (:fullname);")
+            "where u.fullname like (:fullname)")
     List<User> findByFullName(@Param("fullname") String fullname);
 
     @Query(nativeQuery = true,
-            value = "SELECT r.name FROM role r " +
-                    "INNER JOIN user u ON r.id = u.role_id " +
-                    "WHERE u.username = :username")
+            value = "select role.name " +
+                    "from user join users_roles on user.id = users_roles.user_id " +
+                    "join role on role.id = users_roles.role_id " +
+                    "WHERE user.username = :username")
     List<String> findRolesByUsername(@Param("username") String username);
 
     boolean existsByUsername(String username);
 
     boolean existsByEmail(String email);
-
-    boolean existsByPhone(String phone);
 
     boolean existsByPhoneContaining(String data);
 }

@@ -12,6 +12,7 @@ export const AuthContextProvider = ({ children }) => {
         }
         return null;
     });
+
     const navigate = useNavigate();
     const login = async (loginRequest) => {
         await axios.post("http://localhost:8080/api/login", loginRequest).then(response => {

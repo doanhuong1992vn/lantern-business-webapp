@@ -82,7 +82,6 @@ const AdminLogin = () => {
         } else {
             setErrLoginUsername(errEmpty);
         }
-
     }
 
     const handleOnClickSignIn = async () => {
@@ -124,7 +123,7 @@ const AdminLogin = () => {
         setErrUsername('');
         if (isEmpty(username)) {
             setErrUsername(errEmpty);
-        } else if (username.length < 6 || username.length > 20) {
+        } else if (username.length < 8 || username.length > 20) {
             setErrUsername("* Username phải từ 6-20 ký tự")
         } else if (isInvalidUsername(username)) {
             setErrUsername("* Username không được chứa ký tự đặc biệt")
@@ -192,7 +191,7 @@ const AdminLogin = () => {
         if (isEmpty(rePassword)) {
             setErrRepeatPassword(errEmpty);
         } else if (rePassword !== registerRequest.password) {
-            setErrRepeatPassword("* Mật khẩu nhập lại không trùng khớp");
+            setErrRepeatPassword("* Mật khẩu không trùng khớp");
         }
     }
 

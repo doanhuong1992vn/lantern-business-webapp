@@ -9,11 +9,12 @@ import {useNavigate} from "react-router-dom";
 function AdminLayout({children}) {
     const {user} = useContext(AuthContext);
     const navigate = useNavigate();
+
     useEffect(() => {
         if (!user || !user.roles?.some(item => item.name.includes("ADMIN"))) {
             navigate("/error-403");
         }
-    }, []);
+    }, [user]);
     return (
         <div>
             <Sidebar/>

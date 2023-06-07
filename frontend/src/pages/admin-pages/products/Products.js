@@ -103,7 +103,9 @@ const Products = () => {
 
     const handleOnBlurInputName = (e) => {
         setErrorByName('');
-        const nameIsValid = productList.some((item) => (item.name === e.target.value) && (item.id !== product.id));
+        const nameIsValid = productList
+            ? productList.some((item) => (item.name === e.target.value) && (item.id !== product.id))
+            : false;
         if (nameIsValid) {
             setErrorByName("* Tên sản phẩm đã tồn tại");
         }

@@ -49,6 +49,8 @@ public class UserServiceImpl implements UserService {
             String hashedPassword = BCrypt.hashpw(userResponseDto.getPassword(), BCrypt.gensalt(10));
             user.setPassword(hashedPassword);
         }
+        user.setPhone("0" + user.getPhone()
+                .substring(user.getPhone().length() - 9));
         user.setActive(true);
         userRepository.save(user);
     }
@@ -65,7 +67,7 @@ public class UserServiceImpl implements UserService {
         }
         final String phone = registerRequestDTO.getPhone()
                 .substring(registerRequestDTO.getPhone().length() - 9);
-        if (userRepository.existsByPhone(phone)) {
+        if (userRepository.existsByPhoneContaining(phone)) {
             throw new DuplicateFieldUserException(String.format(
                     "Phone number %s already exists!", registerRequestDTO.getPhone()));
         }
@@ -93,7 +95,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean existsByPhone(String phone) {
-        return userRepository.existsByPhone(phone);
+        return userRepository.existsByPhoneContaining(phone);
     }
 
     @Override
