@@ -39,7 +39,7 @@ function App() {
                                 <AdminLogin/>
                             </ProtectedRoute>
                         }></Route>
-                        <Route path="/admin/about-us" element={
+                        <Route path="/admin" element={
                             <ProtectedRoute accessBy="authenticated">
                                 <AdminLayout><AboutUs/></AdminLayout>
                             </ProtectedRoute>

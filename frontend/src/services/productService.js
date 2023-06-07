@@ -1,8 +1,8 @@
-import HttpRequest from '~/utils/HttpRequest';
+import httpRequest from '~/utils/httpRequest';
 
 export const getAll = async (token) => {
     try {
-        return await HttpRequest.get('/admin/products', {
+        return await httpRequest.get('/admin/products', {
             "headers" : {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
@@ -15,8 +15,8 @@ export const getAll = async (token) => {
 
 export const save = async (product, token) => {
     try {
-        console.log('HttpRequest call save product: ' + HttpRequest)
-        return await HttpRequest.post("/admin/products", product, {
+        console.log('httpRequest call save product: ' + httpRequest)
+        return await httpRequest.post("/admin/products", product, {
             "headers" : {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
@@ -29,7 +29,7 @@ export const save = async (product, token) => {
 
 export const update = async (product, token) => {
     try {
-        return await HttpRequest.put("/admin/products", product, {
+        return await httpRequest.put("/admin/products", product, {
             "headers" : {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
@@ -42,7 +42,7 @@ export const update = async (product, token) => {
 
 export const deleteById = async (id, token) => {
     try {
-        await HttpRequest.delete(`/admin/products/${id}`, {
+        await httpRequest.delete(`/admin/products/${id}`, {
             "headers" : {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`

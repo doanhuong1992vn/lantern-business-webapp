@@ -63,7 +63,9 @@ public class UserServiceImpl implements UserService {
             throw new DuplicateFieldUserException(String.format(
                     "Email %s already exists!", registerRequestDTO.getEmail()));
         }
-        if (userRepository.existsByPhone(registerRequestDTO.getPhone())) {
+        final String phone = registerRequestDTO.getPhone()
+                .substring(registerRequestDTO.getPhone().length() - 9);
+        if (userRepository.existsByPhone(phone)) {
             throw new DuplicateFieldUserException(String.format(
                     "Phone number %s already exists!", registerRequestDTO.getPhone()));
         }
@@ -97,6 +99,23 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findByUsername(String username) {
         return userRepository.findByUsername(username);
+    }
+    @Override
+    public boolean existsByFieldAndData(String field, String data) {
+        switch (field) {
+            case "username" -> {
+                return userRepository.existsByUsername(data);
+            }
+            case "email" -> {
+                return userRepository.existsByEmail(data);
+            }
+            case "phone" -> {
+                return userRepository.existsByPhoneContaining(data);
+            }
+            default -> {
+                return false;
+            }
+        }
     }
 
     @Override

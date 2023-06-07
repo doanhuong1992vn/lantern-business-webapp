@@ -1,9 +1,17 @@
 import {Card} from "react-bootstrap";
-import {useContext} from "react";
+import {useContext, useState} from "react";
 import AuthContext from "~/security/AuthContext";
+import {MDBBtn} from "mdb-react-ui-kit";
 
 const Home = () => {
     const {user} = useContext(AuthContext);
+    const [current, setCurrent] = useState(() => user);
+
+    const handleClickLogout = () => {
+        localStorage.removeItem("userProfile");
+        setCurrent(null);
+    }
+
     return (
         <>
             <div
@@ -15,10 +23,16 @@ const Home = () => {
                         <Card.Text>
                             <p className="text-danger h1">Welcome Home Page!</p>
                         </Card.Text>
-                        {user &&
-                            <Card.Text>
-                                Chúc mừng {user.name} đã đăng nhập thành công!
-                            </Card.Text>
+                        {current &&
+                            <div className="text-center">
+                                <Card.Text>
+                                    Chúc mừng {current.name} đã đăng nhập thành công!
+                                </Card.Text>
+                                <MDBBtn type="button" className="gradient-custom-2 ml-3"
+                                onClick={handleClickLogout}>
+                                    Logout
+                                </MDBBtn>
+                            </div>
                         }
                     </Card.Body>
                 </Card>

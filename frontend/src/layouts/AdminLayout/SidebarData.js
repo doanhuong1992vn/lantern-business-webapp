@@ -10,7 +10,7 @@ const cx = classNames.bind(styles);
 export const SidebarData = [
     {
         title: "About Us",
-        path: "/admin/about-us",
+        path: "/admin",
         icon: <FaFortAwesome className={cx('icon-sidebar')}/>,
     },
     {

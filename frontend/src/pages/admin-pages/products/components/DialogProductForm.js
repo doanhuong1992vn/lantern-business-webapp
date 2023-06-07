@@ -5,7 +5,7 @@ import {InputTextarea} from "primereact/inputtextarea";
 import {RadioButton} from "primereact/radiobutton";
 import React, {memo, useEffect, useState} from "react";
 import {Button} from "primereact/button";
-import * as categoryService from "~/services/CategoryService";
+import * as categoryService from "~/services/categoryService";
 
 
 const DialogProductForm = ({

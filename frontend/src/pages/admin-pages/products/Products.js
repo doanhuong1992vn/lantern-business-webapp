@@ -14,8 +14,8 @@ import storage from "~/firebaseConfig";
 import {getDownloadURL, ref, uploadBytesResumable} from "firebase/storage";
 
 
-import * as productService from '~/services/ProductService'
-import * as categoryService from "~/services/CategoryService";
+import * as productService from '~/services/productService'
+import * as categoryService from "~/services/categoryService";
 import {useNavigate} from "react-router-dom";
 import AuthContext from "~/security/AuthContext";
 

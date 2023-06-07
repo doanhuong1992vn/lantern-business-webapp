@@ -14,7 +14,7 @@ public class RegisterRequestDTO {
 //    @Pattern(regexp = "^(?!.*[@;:.=+\\-#%^*'!$&()\"}{\\\\/<>])$")
     private String fullName;
     @NotBlank
-    @Size(min = 6, max = 20)
+    @Size(min = 8, max = 20)
 //    @Pattern(regexp = "^(?!.*[@;:.=+\\-#%^*'!$&()\"}{\\\\/<>])$")
     private String username;
     @NotBlank
@@ -22,7 +22,7 @@ public class RegisterRequestDTO {
     @Email
     private String email;
     @NotBlank
-    @Pattern(regexp = "^(0[3|5|7|8|9])+([0-9]{8})$")
+//    @Pattern(regexp = "^(0|\\+84|84[3|5|7|8|9])+([0-9]{8})$")
     private String phone;
     @NotBlank
     private String password;

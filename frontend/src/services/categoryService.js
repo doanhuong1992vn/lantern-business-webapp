@@ -1,10 +1,10 @@
-import HttpRequest from '~/utils/HttpRequest';
+import httpRequest from '~/utils/httpRequest';
 
 
 export const getAll = async (token) => {
 
     try {
-        return await HttpRequest.get('/admin/categories', {
+        return await httpRequest.get('/admin/categories', {
             "headers" : {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
@@ -17,7 +17,7 @@ export const getAll = async (token) => {
 
 export const save = async (category, token) => {
     try {
-        return await HttpRequest.post("/admin/categories", category, {
+        return await httpRequest.post("/admin/categories", category, {
             "headers" : {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`

@@ -14,8 +14,12 @@ import {
     MDBTabsPane
 } from 'mdb-react-ui-kit';
 import './AdminLogin.css';
-import * as userService from "~/services/UserService";
+import * as userService from "~/services/userService";
 import AuthContext from "~/security/AuthContext"
+import isEmpty from "validator/es/lib/isEmpty";
+import {isInvalidFullName, isInvalidPassword, isInvalidUsername} from "~/validations/validation";
+import isEmail from "validator/es/lib/isEmail";
+import isMobilePhone from "validator/es/lib/isMobilePhone";
 
 const AdminLogin = () => {
     let newLoginRequest = {
@@ -35,7 +39,17 @@ const AdminLogin = () => {
     const [registerRequest, setRegisterRequest] = useState(() => newRegisterRequest);
     const [justifyActive, setJustifyActive] = useState('loginTab');
     const [messageResponse, setMessageResponse] = useState('');
+    const [errFullName, setErrFullName] = useState('');
+    const [errUsername, setErrUsername] = useState('');
+    const [errEmail, setErrEmail] = useState('');
+    const [errPhone, setErrPhone] = useState('');
+    const [errPassword, setErrPassword] = useState('');
+    const [errRepeatPassword, setErrRepeatPassword] = useState('');
+    const [errLoginUsername, setErrLoginUsername] = useState('');
+
     const {user, login} = useContext(AuthContext);
+
+    const errEmpty = "* Ô không được để trống!";
 
 
     const handleJustifyClick = (value) => {
@@ -54,12 +68,32 @@ const AdminLogin = () => {
         setLoginRequest(newLoginRequest);
     }
 
+    const handleBlurLoginUsernameInput = (e) => {
+        let username = e.target ? e.target.value : '';
+        setErrLoginUsername('');
+        if (username) {
+            userService.isExistsByData("username", e.target.value)
+                .then(response => {
+                    if (!response || response.status !== 200) {
+                        setErrLoginUsername(`* Username "${e.target.value}" không tồn tại!`)
+                    }
+                })
+                .catch(err => console.log(err))
+        } else {
+            setErrLoginUsername(errEmpty);
+        }
+
+    }
+
     const handleOnClickSignIn = async () => {
+        if (errLoginUsername || !loginRequest.username || !loginRequest.password) {
+            setMessageResponse("* Vui lòng nhập đầy đủ thông tin đăng nhập!")
+        }
         try {
             await login(loginRequest);
             setLoginRequest(newLoginRequest);
             if (!user) {
-                setMessageResponse("Đăng nhập thất bại! Vui lòng nhập lại thông tin!")
+                setMessageResponse("* Đăng nhập thất bại! Vui lòng kiểm tra lại thông tin!")
             }
         } catch (err) {
 
@@ -73,7 +107,106 @@ const AdminLogin = () => {
         setRegisterRequest(newRegisterRequest);
     }
 
+    const handleBlurFullNameInput = (e) => {
+        const fullName = e.target ? e.target.value : e;
+        setErrFullName('');
+        if (isEmpty(fullName)) {
+            setErrFullName(errEmpty);
+        } else if (fullName.length < 2 || fullName.length > 50) {
+            setErrFullName("* Full name phải từ 2-50 ký tự")
+        } else if (isInvalidFullName(fullName)) {
+            setErrFullName("* Full name không được chứa số hoặc ký tự đặc biệt")
+        }
+    }
+
+    const handleBlurUsernameRegisterInput = async (e) => {
+        let username = e.target ? e.target.value : e;
+        setErrUsername('');
+        if (isEmpty(username)) {
+            setErrUsername(errEmpty);
+        } else if (username.length < 6 || username.length > 20) {
+            setErrUsername("* Username phải từ 6-20 ký tự")
+        } else if (isInvalidUsername(username)) {
+            setErrUsername("* Username không được chứa ký tự đặc biệt")
+        } else {
+            await userService.isExistsByData("username", username)
+                .then(response => {
+                    if (response && response.status === 200) {
+                        setErrUsername(`* Username "${username}" đã được sử dụng!`)
+                    }
+                })
+                .catch(err => console.log(err))
+        }
+    }
+
+    const handleBlurEmailInput = async (e) => {
+        let email = e.target ? e.target.value : e;
+        setErrEmail('');
+        if (isEmpty(email)) {
+            setErrEmail(errEmpty);
+        } else if (!isEmail(email)) {
+            setErrEmail("* Vui lòng nhập đúng định dạng email")
+        } else {
+            await userService.isExistsByData("email", email)
+                .then(response => {
+                    if (response && response.status === 200) {
+                        setErrEmail(`* Email "${email}" đã được sử dụng!`)
+                    }
+                })
+                .catch(err => console.log(err))
+        }
+    }
+
+    const handleBlurPhoneInput = async (e) => {
+        let phone = e.target ? e.target.value : e;
+        setErrPhone('');
+        if (isEmpty(phone)) {
+            setErrPhone(errEmpty);
+        } else if (!isMobilePhone(phone, 'vi-VN')) {
+            setErrPhone("* Vui lòng nhập đúng định dạng SĐT tại Việt Nam")
+        } else {
+            await userService.isExistsByData("phone", phone.slice(-9))
+                .then(response => {
+                    if (response && response.status === 200) {
+                        setErrPhone(`* Phone number "${phone}" đã được sử dụng!`)
+                    }
+                })
+                .catch(err => console.log(err))
+        }
+    }
+
+    const handleBlurPasswordInput = (e) => {
+        let password = e.target ? e.target.value : e;
+        setErrPassword('');
+        if (isEmpty(password)) {
+            setErrPassword(errEmpty);
+        } else if (!isInvalidPassword(password)) {
+            setErrPassword("* Mật khẩu chưa đủ mạnh, phải có ít nhất 8 ký tự " +
+                "gồm ít nhất 1 chữ hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt.")
+        }
+    }
+
+    const handleBlurRePasswordInput = (e) => {
+        let rePassword = e.target ? e.target.value : e;
+        setErrRepeatPassword('');
+        if (isEmpty(rePassword)) {
+            setErrRepeatPassword(errEmpty);
+        } else if (rePassword !== registerRequest.password) {
+            setErrRepeatPassword("* Mật khẩu nhập lại không trùng khớp");
+        }
+    }
+
     const handleClickSignUp = async () => {
+        handleBlurRePasswordInput(registerRequest.repeatPassword);
+        handleBlurPasswordInput(registerRequest.password);
+        handleBlurFullNameInput(registerRequest.fullName);
+        await handleBlurPhoneInput(registerRequest.phone);
+        await handleBlurEmailInput(registerRequest.email);
+        await handleBlurUsernameRegisterInput(registerRequest.username);
+        if (errFullName || errUsername || errEmail || errPhone || errPassword || errRepeatPassword) {
+            setMessageResponse("* Vui lòng nhập đầy đủ thông tin đăng ký");
+            return;
+        }
         const newUser = {
             fullName: registerRequest.fullName,
             username: registerRequest.username,
@@ -81,8 +214,12 @@ const AdminLogin = () => {
             phone: registerRequest.phone,
             password: registerRequest.password
         }
+        console.log(newUser)
         await userService.register(newUser)
             .then((response) => {
+                if (!response) {
+                    setMessageResponse("Đăng ký thất bại! Vui lòng kiểm tra lại thông tin!");
+                }
                 if (response && response.status === 201) {
                     setMessageResponse(response.data.message);
                     setJustifyActive("loginTab")
@@ -90,10 +227,40 @@ const AdminLogin = () => {
                 }
             })
             .catch(error => {
-                console.log(error)
-                setMessageResponse("Đăng ký thất bại! Vui lòng nhập lại thông tin!");
+                console.log("Lỗi: " + error)
             });
     }
+
+    const labelFullName = (
+        <div>
+            <p>Full name <sup style={{color: "red"}}>*</sup></p>
+        </div>
+    )
+    const labelUsername = (
+        <div>
+            <p>Username <sup style={{color: "red"}}>*</sup></p>
+        </div>
+    )
+    const labelEmail = (
+        <div>
+            <p>Email <sup style={{color: "red"}}>*</sup></p>
+        </div>
+    )
+    const labelPhone = (
+        <div>
+            <p>Phone number <sup style={{color: "red"}}>*</sup></p>
+        </div>
+    )
+    const labelPassword = (
+        <div>
+            <p>Password <sup style={{color: "red"}}>*</sup></p>
+        </div>
+    )
+    const labelRePassword = (
+        <div>
+            <p>Repeat password <sup style={{color: "red"}}>*</sup></p>
+        </div>
+    )
 
     return (
         <MDBContainer className="my-5 gradient-form">
@@ -145,10 +312,12 @@ const AdminLogin = () => {
                                     </div>
                                     <MDBInput onChange={(e) => handleChangeInputLogin(e, "username")}
                                               value={loginRequest.username}
-                                              wrapperClass='mb-4' label='Username' type='text'/>
+                                              onBlur={handleBlurLoginUsernameInput}
+                                              wrapperClass='' label="Username" type='text'/>
+                                    <small className="p-error">{errLoginUsername}</small>
                                     <MDBInput onChange={(e) => handleChangeInputLogin(e, "password")}
                                               value={loginRequest.password}
-                                              wrapperClass='mb-4' label='Password' type='password'/>
+                                              wrapperClass='mt-3' label="Password" type='password'/>
                                     <div className="d-flex justify-content-between mx-4 mb-4">
                                         <MDBCheckbox name='flexCheck' value='' id='flexCheckDefault'
                                                      label='Remember me'/>
@@ -186,17 +355,35 @@ const AdminLogin = () => {
                                         <p className="text-center mt-3">or:</p>
                                     </div>
                                     <MDBInput onChange={(event) => handleChangeInputRegister(event, "fullName")}
-                                              wrapperClass='mb-4' label='Full Name' type='text'/>
+                                              onBlur={handleBlurFullNameInput}
+                                              label={labelFullName}
+                                              wrapperClass='' type='text' maxLength={51}/>
+                                    <small className="p-error">{errFullName}</small>
                                     <MDBInput onChange={(event) => handleChangeInputRegister(event, "username")}
-                                              wrapperClass='mb-4' label='Username' type='text'/>
+                                              onBlur={handleBlurUsernameRegisterInput}
+                                              label={labelUsername}
+                                              wrapperClass='mt-3' type='text'/>
+                                    <small className="p-error">{errUsername}</small>
                                     <MDBInput onChange={(event) => handleChangeInputRegister(event, "email")}
-                                              wrapperClass='mb-4' label='Email' type='email'/>
+                                              label={labelEmail}
+                                              onBlur={handleBlurEmailInput}
+                                              wrapperClass='mt-3' type='email'/>
+                                    <small className="p-error">{errEmail}</small>
                                     <MDBInput onChange={(event) => handleChangeInputRegister(event, "phone")}
-                                              wrapperClass='mb-4' label='Phone' type='text'/>
+                                              label={labelPhone}
+                                              onBlur={handleBlurPhoneInput}
+                                              wrapperClass='mt-3' type='text'/>
+                                    <small className="p-error">{errPhone}</small>
                                     <MDBInput onChange={(event) => handleChangeInputRegister(event, "password")}
-                                              wrapperClass='mb-4' label='Password' type='password'/>
+                                              label={labelPassword}
+                                              onBlur={handleBlurPasswordInput}
+                                              wrapperClass='mt-3' type='password'/>
+                                    <small className="p-error">{errPassword}</small>
                                     <MDBInput onChange={(event) => handleChangeInputRegister(event, "repeatPassword")}
-                                              wrapperClass='mb-4' label='Repeat Password' type='password'/>
+                                              label={labelRePassword}
+                                              onBlur={handleBlurRePasswordInput}
+                                              wrapperClass='mt-3' type='password'/>
+                                    <small className="p-error">{errRepeatPassword}</small>
                                     <p className="text-center text-primary">{messageResponse}</p>
                                     <MDBBtn onClick={handleClickSignUp} className="mb-4 w-100 gradient-custom-2 mt-3">
                                         Sign up
@@ -207,7 +394,6 @@ const AdminLogin = () => {
                     </div>
                 </MDBCol>
             </MDBRow>
-
         </MDBContainer>
     );
 }
