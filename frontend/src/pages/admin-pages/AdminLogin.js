@@ -221,8 +221,8 @@ const AdminLogin = () => {
                 }
                 if (response && response.status === 201) {
                     setMessageResponse(response.data.message);
-                    setJustifyActive("loginTab")
                     setRegisterRequest(newRegisterRequest);
+                    setJustifyActive("loginTab")
                 }
             })
             .catch(error => {

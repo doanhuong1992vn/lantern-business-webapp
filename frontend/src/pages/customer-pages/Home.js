@@ -1,38 +1,23 @@
 import {Card} from "react-bootstrap";
-import {useContext, useEffect, useState} from "react";
+import {useContext, useState} from "react";
 import AuthContext from "~/security/AuthContext";
 import {MDBBtn} from "mdb-react-ui-kit";
 import {useNavigate} from "react-router-dom";
 
 
 const Home = () => {
-    const {user} = useContext(AuthContext);
-    const [current, setCurrent] = useState(null);
+    const {user, logout} = useContext(AuthContext);
     const [isLogged, setIsLogged] = useState(() => {
-        return user ? true : false;
+        return !!user;
     });
-
     const navigate = useNavigate();
 
-    useEffect(() => {
-        isLogged ? setCurrent(user) : setCurrent(null);
-    }, []);
-
     const handleClickLogout = () => {
-        localStorage.removeItem("userProfile");
-        console.log(localStorage.getItem("userProfile"))
-        setCurrent(null);
+        logout();
         setIsLogged(false);
     }
 
     function handleClickLogin() {
-        // if (!user) {
-        //     console.log("user null"+user)
-        //     navigate("/login")
-        // } else {
-        //     console.log(user)
-        // }
-        setCurrent(null);
         setIsLogged(false);
         navigate("/login")
     }
@@ -51,7 +36,7 @@ const Home = () => {
                         {isLogged
                             ? <div className="text-center">
                                 <Card.Text>
-                                    Chúc mừng {current?.name} đã đăng nhập thành công!
+                                    Chúc mừng {user?.name} đã đăng nhập thành công!
                                 </Card.Text>
                                 <MDBBtn type="button" className="gradient-custom-2 ml-3"
                                         onClick={handleClickLogout}>

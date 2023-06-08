@@ -1,5 +1,5 @@
-create database lantern_business_;
-use lantern_business_;
+create database lantern_business;
+use lantern_business;
 create table role
 (
     id          int primary key auto_increment,

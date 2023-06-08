@@ -69,6 +69,7 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.findAllByCategory(category, pageable);
     }
 
+
     @Override
     public List<ProductResponseDTO> findByActiveTrue() {
         return productRepository.findByActiveTrue().stream()

@@ -24,9 +24,16 @@ export const AuthContextProvider = ({ children }) => {
             }
         }).catch(error => console.log("Axios lỗi đăng nhập: " + error));
     };
+
+    const logout = async () => {
+        localStorage.removeItem("userProfile");
+        setUser(null);
+        navigate("/login");
+    };
+
     return (
         <>
-            <AuthContext.Provider value={{ user, login }}>
+            <AuthContext.Provider value={{ user, login, logout }}>
                 {children}
             </AuthContext.Provider>
         </>
