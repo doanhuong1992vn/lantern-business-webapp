@@ -31,7 +31,7 @@ class MainLayout extends React.Component {
 
       this.notificationSystem.addNotification({
         title: <MdImportantDevices />,
-        message: 'Welcome to Reduction Admin!',
+        message: 'Welome to Reduction Admin!',
         level: 'info',
       });
     }, 1500);
