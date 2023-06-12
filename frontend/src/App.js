@@ -1,4 +1,5 @@
 import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
+import componentQueries from 'react-component-queries';
 import {AdminLayout} from '~/layouts';
 import Home from "~/pages/customer-pages/Home";
 import AdminLogin from "~/pages/admin-pages/AdminLogin";
@@ -10,8 +11,9 @@ import ImportProduct from "~/pages/admin-pages/products/ImportProduct";
 import {AuthContextProvider} from "~/security/AuthContext";
 import ProtectedRoute from "~/security/ProtectedRoute";
 import Error403 from "~/pages/error-pages/Error403";
+import '~/styles/reduction.scss';
 
-function App() {
+const App = ({ breakpoint }) => {
     return (
         <Router>
             <div className="App">
@@ -41,27 +43,27 @@ function App() {
                         }></Route>
                         <Route path="/admin" element={
                             <ProtectedRoute accessBy="authenticated">
-                                <AdminLayout><AboutUs/></AdminLayout>
+                                <AdminLayout breakpoint={breakpoint}><AboutUs/></AdminLayout>
                             </ProtectedRoute>
                         }></Route>
                         <Route path="/admin/dashboard" element={
                             <ProtectedRoute accessBy="authenticated">
-                                <AdminLayout><Dashboard/></AdminLayout>
+                                <AdminLayout breakpoint={breakpoint}><Dashboard/></AdminLayout>
                             </ProtectedRoute>
                         }></Route>
                         <Route path="/admin/categories" element={
                             <ProtectedRoute accessBy="authenticated">
-                                <AdminLayout><Categories/></AdminLayout>
+                                <AdminLayout breakpoint={breakpoint}><Categories/></AdminLayout>
                             </ProtectedRoute>
                         }></Route>
                         <Route path="/admin/products" element={
                             <ProtectedRoute accessBy="authenticated">
-                                <AdminLayout><Products/></AdminLayout>
+                                <AdminLayout breakpoint={breakpoint}><Products/></AdminLayout>
                             </ProtectedRoute>
                         }></Route>
                         <Route path="/admin/import-products" element={
                             <ProtectedRoute accessBy="authenticated">
-                                <AdminLayout><ImportProduct/></AdminLayout>
+                                <AdminLayout breakpoint={breakpoint}><ImportProduct/></AdminLayout>
                             </ProtectedRoute>
                         }></Route>
                     </Routes>
@@ -71,4 +73,29 @@ function App() {
     );
 }
 
-export default App;
+const query = ({ width }) => {
+    if (width < 575) {
+        return { breakpoint: 'xs' };
+    }
+
+    if (576 < width && width < 767) {
+        return { breakpoint: 'sm' };
+    }
+
+    if (768 < width && width < 991) {
+        return { breakpoint: 'md' };
+    }
+
+    if (992 < width && width < 1199) {
+        return { breakpoint: 'lg' };
+    }
+
+    if (width > 1200) {
+        return { breakpoint: 'xl' };
+    }
+
+    return { breakpoint: 'xs' };
+};
+
+
+export default componentQueries(query)(App);
