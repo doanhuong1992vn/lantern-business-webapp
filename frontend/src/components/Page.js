@@ -17,7 +17,7 @@ const Page = ({
   children,
   ...restProps
 }) => {
-  const classes = bem.b('px-3', className);
+  const classes = bem.b('px-3 m-3', className);
 
   return (
     <Tag className={classes} {...restProps}>
@@ -31,13 +31,13 @@ const Page = ({
           )}
         {breadcrumbs && (
           <Breadcrumb className={bem.e('breadcrumb')}>
-            <BreadcrumbItem>Home</BreadcrumbItem>
             {breadcrumbs.length &&
               breadcrumbs.map(({ name, active }, index) => (
                 <BreadcrumbItem key={index} active={active}>
                   {name}
                 </BreadcrumbItem>
               ))}
+            <BreadcrumbItem>Home</BreadcrumbItem>
           </Breadcrumb>
         )}
       </div>

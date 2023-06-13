@@ -23,8 +23,10 @@ public class Product {
     private String description;
     @Column(columnDefinition = "TEXT")
     private String image;
-    @Column(name = "active")
+    @Column
     private boolean active;
+    @Column(name = "is_show")
+    private boolean isShow;
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private Collection<Variant> variants;
     @ManyToOne(fetch = FetchType.EAGER)

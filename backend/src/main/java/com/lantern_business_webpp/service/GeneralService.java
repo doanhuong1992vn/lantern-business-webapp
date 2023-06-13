@@ -1,7 +1,6 @@
 package com.lantern_business_webpp.service;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface GeneralService<REQUEST_DTO, RESPONSE_DTO> {
 
@@ -11,6 +10,5 @@ public interface GeneralService<REQUEST_DTO, RESPONSE_DTO> {
 
     void delete(Long id);
 
-//    RESPONSE_DTO update(REQUEST_DTO REQUEST_DTO);
     List<RESPONSE_DTO> findByActiveTrue();
 }

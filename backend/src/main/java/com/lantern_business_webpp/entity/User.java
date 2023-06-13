@@ -1,11 +1,10 @@
 package com.lantern_business_webpp.entity;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 

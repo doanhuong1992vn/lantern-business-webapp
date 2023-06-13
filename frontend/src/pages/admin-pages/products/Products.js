@@ -18,6 +18,9 @@ import * as productService from '~/services/productService'
 import * as categoryService from "~/services/categoryService";
 import {useNavigate} from "react-router-dom";
 import AuthContext from "~/security/AuthContext";
+import * as sizeService from "~/services/sizeService";
+import * as colorService from "~/services/colorService";
+import {Checkbox} from "primereact/checkbox";
 
 const Products = () => {
     let newProduct = {
@@ -25,10 +28,15 @@ const Products = () => {
         image: null,
         description: '',
         category: {},
+        variants: []
     };
-    const [file, setFile] = useState("");
+    const [file, setFile] = useState('');
     const [productList, setProductList] = useState([]);
     const [categories, setCategories] = useState([]);
+    const [sizes, setSizes] = useState([]);
+    const [checkedSizes, setCheckedSizes] = useState([]);
+    const [colors, setColors] = useState([]);
+    const [checkedColors, setCheckedColors] = useState([]);
     const [productDialog, setProductDialog] = useState(false);
     const [deleteProductDialog, setDeleteProductDialog] = useState(false);
     const [deleteProductListDialog, setDeleteProductListDialog] = useState(false);
@@ -43,7 +51,7 @@ const Products = () => {
     const toast = useRef(null);
     const dt = useRef(null);
     const navigate = useNavigate();
-    const { user } = useContext(AuthContext);
+    const {user} = useContext(AuthContext);
 
     useEffect(() => {
         if (!user) {
@@ -51,10 +59,16 @@ const Products = () => {
         } else {
             productService.getAll(user.token)
                 .then((response) => setProductList(response.data))
-                .catch((error) => /*navigate("/error-403")*/console.log(error));
+                .catch(() => navigate("/error-403"));
             categoryService.getAll(user.token)
                 .then((response) => setCategories(response.data))
-                .catch((error) => /*navigate("/error-403")*/console.log(error));
+                .catch(() => navigate("/error-403"));
+            sizeService.getAll(user.token)
+                .then((response) => setSizes(response.data))
+                .catch(() => navigate("/error-403"));
+            colorService.getAll(user.token)
+                .then((response) => setColors(response.data))
+                .catch(() => navigate("/error-403"));
         }
     }, [user]);
 
@@ -91,6 +105,22 @@ const Products = () => {
         _product['category'] = e.value;
         setProduct(_product);
     };
+
+    const handleChangeSize = (e) => {
+        if (e.target.checked) {
+            setCheckedSizes([...checkedSizes, e.target.value])
+        } else {
+            setCheckedSizes(checkedSizes.filter((item) => item.id !== e.target.value.id));
+        }
+    }
+
+    const handleChangeColor = (e) => {
+        if (e.target.checked) {
+            setCheckedColors([...checkedColors, e.target.value])
+        } else {
+            setCheckedColors(checkedColors.filter((item) => item.id !== e.target.value.id));
+        }
+    }
 
     const handleOnChangeInput = (e, name) => {
         const val = (e.target && e.target.value) || '';
@@ -383,6 +413,71 @@ const Products = () => {
                         ))}
                     </div>
                 </div>
+
+                <div className="field">
+                    <div className="formgrid grid">
+                        <div className="field col">
+                            <label className="font-bold">
+                                Size
+                            </label>
+                            {sizes.map((size) => (
+                                <div className="field-radiobutton col-6 mt-3" key={size.id}>
+                                    <Checkbox inputId={size.id} name="size" value={size}
+                                              onChange={handleChangeSize}
+                                              checked={checkedSizes.some(item => item.id === size.id)}
+                                    />
+                                    <label htmlFor={size.id}>{size.name}</label>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="field col">
+                            <label className="font-bold">
+                                Color
+                            </label>
+                            {colors.map((color) => (
+                                <div className="field-radiobutton col-6 mt-3" key={color.id}>
+                                    <Checkbox inputId={color.id} name="size" value={color}
+                                              onChange={handleChangeColor}
+                                              checked={checkedColors.some(item => item.id === color.id)}
+                                    />
+                                    <label htmlFor={color.id}>{color.name}</label>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                <div className="field formgrid grid">
+                    {checkedSizes &&
+                        <table className="table">
+                            <tr>
+                                <th scope="col">Size</th>
+                                <th>Color</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                            </tr>
+                            {checkedSizes && checkedSizes.map(size => (
+                                <>
+                                    <tr>
+                                        <td rowSpan={checkedColors.length}>{size.name}</td>
+                                        <td>{checkedColors[0] ? checkedColors[0].name : ''}</td>
+                                        <td><input/></td>
+                                        <td><input/></td>
+                                    </tr>
+                                    {checkedColors.map((color, index) => {
+                                        return <>{index !== 0 &&
+                                            <tr>
+                                                <td>{color.name}</td>
+                                                <td><input/></td>
+                                                <td><input/></td>
+                                            </tr>}</>
+                                    })}
+                                </>
+                            ))}
+                        </table>
+                    }
+                </div>
+
 
                 {/*<div className="formgrid grid">*/}
                 {/*    <div className="field col">*/}

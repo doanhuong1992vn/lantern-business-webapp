@@ -18,15 +18,21 @@ public class Variant {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(length = 15)
-    private String size;
-    @Column(length = 20)
-    private String color;
     @Column(columnDefinition = "int default 0")
     private Integer quantity;
     @Column(columnDefinition = "double default 0")
     private Double price;
+    @Column(name = "is_active")
+    private boolean active;
+    @Column(name = "is_show")
+    private boolean isShow;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_id", referencedColumnName = "id")
     private Product product;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "size_id", referencedColumnName = "id")
+    private Size size;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "color_id", referencedColumnName = "id")
+    private Color color;
 }
