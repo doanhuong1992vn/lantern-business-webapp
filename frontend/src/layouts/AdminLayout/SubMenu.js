@@ -14,10 +14,12 @@ const SidebarLink = styled(Link)`
   font-size: 18px;
 
   &:hover {
-    background: #f1cff1;
-    border-left: 4px solid #fe5f04;
+    //background: linear-gradient(to bottom, #ea7b33, #d65256, #df4883, #b8559b);
+    background: rgba(#ffffff, 0.15);
+    
+    border-left: 4px solid #ffffff;
     cursor: pointer;
-    color: black;
+    color: #fbd500;
   }
 `;
 
@@ -26,7 +28,8 @@ const SidebarLabel = styled.span`
 `;
 
 const DropdownLink = styled(Link)`
-  background: #252831;
+  background: linear-gradient(to bottom, #ea7b33, #d65256, #df4883, #b8559b);
+  //background: rgba(#ffffff, 0.15);
   height: 60px;
   padding-left: 3rem;
   display: flex;
@@ -36,34 +39,37 @@ const DropdownLink = styled(Link)`
   font-size: 18px;
 
   &:hover {
-    background: #f1cff1;
+    //background: linear-gradient(to right, #ea7b33, #d65256, #df4883, #b8559b);
+    background: rgba(#ffffff, 0.15);
+    
     cursor: pointer;
-    color: black;
+    color: #fbd500;
+    border-left: 4px solid #ffffff;
   }
 `;
 
 const SubMenu = ({ item }) => {
-    const [subnav, setSubnav] = useState(false);
+    const [subNav, setSubNav] = useState(false);
 
-    const showSubnav = () => setSubnav(!subnav);
+    const showSubNav = () => setSubNav(!subNav);
 
     return (
         <>
             <SidebarLink to={item.path}
-                         onClick={item.subNav && showSubnav}>
+                         onClick={item.subNav && showSubNav}>
                 <div>
                     {item.icon}
                     <SidebarLabel>{item.title}</SidebarLabel>
                 </div>
                 <div>
-                    {item.subNav && subnav
+                    {item.subNav && subNav
                         ? item.iconOpened
                         : item.subNav
                             ? item.iconClosed
                             : null}
                 </div>
             </SidebarLink>
-            {subnav &&
+            {subNav &&
                 item.subNav.map((item, index) => {
                     return (
                         <DropdownLink to={item.path} key={index}>

@@ -9,14 +9,14 @@ import {
 } from 'reactstrap';
 import bn from '~/utils/bemnames';
 import logo200Image from '~/assets/img/logo/logo_200.png';
-import sidebarBgImage from '~/assets/img/sidebar/sidebar-4.jpg';
+import sidebarBgImage from '~/assets/img/sidebar/sidebar-5.jpg';
 import SourceLink from '~/components/SourceLink';
-import { FaGithub } from 'react-icons/fa';
+import {FaBox, FaCubes, FaDolly, FaGithub, FaLaptopCode} from 'react-icons/fa';
 import {
     MdAccountCircle,
     MdArrowDropDownCircle,
     MdBorderAll,
-    MdBrush,
+    MdBrush, MdCategory,
     MdChromeReaderMode,
     MdDashboard,
     MdExtension,
@@ -35,6 +35,8 @@ import {
     MdWeb,
     MdWidgets,
 } from 'react-icons/md';
+import {SidebarData} from "~/layouts/AdminLayout/SidebarData";
+import SubMenu from "~/layouts/AdminLayout/SubMenu";
 
 const sidebarBackground = {
     backgroundImage: `url("${sidebarBgImage}")`,
@@ -42,67 +44,27 @@ const sidebarBackground = {
     backgroundRepeat: 'no-repeat',
 };
 
-const navComponents = [
-    { to: '/buttons', name: 'buttons', exact: false, Icon: MdRadioButtonChecked },
-    {
-        to: '/button-groups',
-        name: 'button groups',
-        exact: false,
-        Icon: MdGroupWork,
-    },
-    { to: '/forms', name: 'forms', exact: false, Icon: MdChromeReaderMode },
-    { to: '/input-groups', name: 'input groups', exact: false, Icon: MdViewList },
-    {
-        to: '/dropdowns',
-        name: 'dropdowns',
-        exact: false,
-        Icon: MdArrowDropDownCircle,
-    },
-    { to: '/badges', name: 'badges', exact: false, Icon: MdStar },
-    { to: '/alerts', name: 'alerts', exact: false, Icon: MdNotificationsActive },
-    { to: '/progress', name: 'progress', exact: false, Icon: MdBrush },
-    { to: '/modals', name: 'modals', exact: false, Icon: MdViewDay },
+const navProducts = [
+    { to: '/admin/products', name: 'Products', exact: false, Icon: MdViewList },
+    { to: '/admin/import-products', name: 'Import', exact: false, Icon: FaDolly },
+
 ];
 
-const navContents = [
-    { to: '/typography', name: 'typography', exact: false, Icon: MdTextFields },
-    { to: '/tables', name: 'tables', exact: false, Icon: MdBorderAll },
-];
-
-const pageContents = [
-    { to: '/login', name: 'login / signup', exact: false, Icon: MdAccountCircle },
-    {
-        to: '/login-modal',
-        name: 'login modal',
-        exact: false,
-        Icon: MdViewCarousel,
-    },
-];
 
 const navItems = [
-    { to: '/', name: 'dashboard', exact: true, Icon: MdDashboard },
-    { to: '/cards', name: 'cards', exact: false, Icon: MdWeb },
-    { to: '/charts', name: 'charts', exact: false, Icon: MdInsertChart },
-    { to: '/widgets', name: 'widgets', exact: false, Icon: MdWidgets },
+    { to: '/admin/dashboard', name: 'Dashboard', exact: true, Icon: FaLaptopCode },
+    { to: '/admin/categories', name: 'Categories', exact: false, Icon: MdDashboard },
 ];
 
 const bem = bn.create('sidebar');
 
 const Sidebar = () => {
-    const [isOpenComponents, setIsOpenComponents] = useState(true);
-    const [isOpenContents, setIsOpenContents] = useState(true);
-    const [isOpenPages, setIsOpenPages] = useState(true);
+    const [isOpenProducts, setIsOpenProducts] = useState(true);
 
     const handleClick = (name) => () => {
         switch (name) {
-            case 'Components':
-                setIsOpenComponents(!isOpenComponents);
-                break;
-            case 'Contents':
-                setIsOpenContents(!isOpenContents);
-                break;
-            case 'Pages':
-                setIsOpenPages(!isOpenPages);
+            case 'Products':
+                setIsOpenProducts(!isOpenProducts);
                 break;
             default:
                 break;
@@ -114,11 +76,9 @@ const Sidebar = () => {
             <div className={bem.e('background')} style={sidebarBackground} />
             <div className={bem.e('content')}>
                 <Navbar>
-                    <SourceLink className="navbar-brand d-flex">
-                        <img src={logo200Image} width="40" height="30" className="pr-2" alt="" />
-                        <span className="text-white">
-              Reduction <FaGithub />
-            </span>
+                    <SourceLink className="navbar-brand col-12 d-flex justify-content-center">
+                        <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/lotus.webp"
+                             width="80" height="45" alt="logo" />
                     </SourceLink>
                 </Navbar>
                 <Nav vertical>
@@ -138,96 +98,26 @@ const Sidebar = () => {
                         </NavItem>
                     ))}
 
-                    <NavItem className={bem.e('nav-item')} onClick={handleClick('Components')}>
+                    <NavItem className={bem.e('nav-item')} onClick={handleClick('Products')}>
                         <BSNavLink className={bem.e('nav-item-collapse')}>
                             <div className="d-flex">
-                                <MdExtension className={bem.e('nav-item-icon')} />
-                                <span className=" align-self-start">Components</span>
+                                <FaCubes className={bem.e('nav-item-icon')} />
+                                <span className=" align-self-start">PRODUCTS</span>
                             </div>
                             <MdKeyboardArrowDown
                                 className={bem.e('nav-item-icon')}
                                 style={{
                                     padding: 0,
-                                    transform: isOpenComponents ? 'rotate(0deg)' : 'rotate(-90deg)',
+                                    transform: isOpenProducts ? 'rotate(0deg)' : 'rotate(-90deg)',
                                     transitionDuration: '0.3s',
                                     transitionProperty: 'transform',
                                 }}
                             />
                         </BSNavLink>
                     </NavItem>
-                    <Collapse isOpen={isOpenComponents}>
-                        {navComponents.map(({ to, name, exact, Icon }, index) => (
-                            <NavItem key={index} className={bem.e('nav-item')}>
-                                <BSNavLink
-                                    id={`navItem-${name}-${index}`}
-                                    className="text-uppercase"
-                                    tag={NavLink}
-                                    to={to}
-                                    activeClassName="active"
-                                    exact={exact}
-                                >
-                                    <Icon className={bem.e('nav-item-icon')} />
-                                    <span className="">{name}</span>
-                                </BSNavLink>
-                            </NavItem>
-                        ))}
-                    </Collapse>
-
-                    <NavItem className={bem.e('nav-item')} onClick={handleClick('Contents')}>
-                        <BSNavLink className={bem.e('nav-item-collapse')}>
-                            <div className="d-flex">
-                                <MdSend className={bem.e('nav-item-icon')} />
-                                <span className="">Contents</span>
-                            </div>
-                            <MdKeyboardArrowDown
-                                className={bem.e('nav-item-icon')}
-                                style={{
-                                    padding: 0,
-                                    transform: isOpenContents ? 'rotate(0deg)' : 'rotate(-90deg)',
-                                    transitionDuration: '0.3s',
-                                    transitionProperty: 'transform',
-                                }}
-                            />
-                        </BSNavLink>
-                    </NavItem>
-                    <Collapse isOpen={isOpenContents}>
-                        {navContents.map(({ to, name, exact, Icon }, index) => (
-                            <NavItem key={index} className={bem.e('nav-item')}>
-                                <BSNavLink
-                                    id={`navItem-${name}-${index}`}
-                                    className="text-uppercase"
-                                    tag={NavLink}
-                                    to={to}
-                                    activeClassName="active"
-                                    exact={exact}
-                                >
-                                    <Icon className={bem.e('nav-item-icon')} />
-                                    <span className="">{name}</span>
-                                </BSNavLink>
-                            </NavItem>
-                        ))}
-                    </Collapse>
-
-                    <NavItem className={bem.e('nav-item')} onClick={handleClick('Pages')}>
-                        <BSNavLink className={bem.e('nav-item-collapse')}>
-                            <div className="d-flex">
-                                <MdPages className={bem.e('nav-item-icon')} />
-                                <span className="">Pages</span>
-                            </div>
-                            <MdKeyboardArrowDown
-                                className={bem.e('nav-item-icon')}
-                                style={{
-                                    padding: 0,
-                                    transform: isOpenPages ? 'rotate(0deg)' : 'rotate(-90deg)',
-                                    transitionDuration: '0.3s',
-                                    transitionProperty: 'transform',
-                                }}
-                            />
-                        </BSNavLink>
-                    </NavItem>
-                    <Collapse isOpen={isOpenPages}>
-                        {pageContents.map(({ to, name, exact, Icon }, index) => (
-                            <NavItem key={index} className={bem.e('nav-item')}>
+                    <Collapse isOpen={isOpenProducts}>
+                        {navProducts.map(({ to, name, exact, Icon }, index) => (
+                            <NavItem key={index} className={bem.e('nav-item ml-5')}>
                                 <BSNavLink
                                     id={`navItem-${name}-${index}`}
                                     className="text-uppercase"

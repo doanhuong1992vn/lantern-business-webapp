@@ -297,7 +297,7 @@ const Products = () => {
     );
 
     return (
-        <div>
+        <div className="m-3">
             <Toast ref={toast}/>
             <div className="card">
                 <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>

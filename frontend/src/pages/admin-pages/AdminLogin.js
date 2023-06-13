@@ -206,14 +206,7 @@ const AdminLogin = () => {
             setMessageResponse("* Vui lòng nhập đầy đủ thông tin đăng ký");
             return;
         }
-        const newUser = {
-            fullName: registerRequest.fullName,
-            username: registerRequest.username,
-            email: registerRequest.email,
-            phone: registerRequest.phone,
-            password: registerRequest.password
-        }
-        console.log(newUser)
+        const {repeatPassword, ...newUser} = registerRequest;
         await userService.register(newUser)
             .then((response) => {
                 if (!response) {

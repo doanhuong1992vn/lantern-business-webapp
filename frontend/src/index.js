@@ -3,23 +3,20 @@ import ReactDOM from 'react-dom/client';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "primereact/resources/themes/lara-light-indigo/theme.css";
 import "primereact/resources/primereact.min.css";
-import 'primeicons/primeicons.css';                                 // icons
-import 'primeflex/primeflex.css';                                   // css utility
+import 'primeicons/primeicons.css'; // icons
+import 'primeflex/primeflex.css'; // css utility
 import '~/flags.css';
-import 'mdb-react-ui-kit/dist/css/mdb.min.css';                     //mdb react
-import "@fortawesome/fontawesome-free/css/all.min.css";             //mdb react - font
-
+import 'mdb-react-ui-kit/dist/css/mdb.min.css'; //mdb react
+import "@fortawesome/fontawesome-free/css/all.min.css"; //mdb react - font
 import App from '~/App';
 import reportWebVitals from './reportWebVitals';
 import GlobalStyles from '~/components/GlobalStyles';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  // <React.StrictMode>
     <GlobalStyles>
       <App />
     </GlobalStyles>
-  // </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function
