@@ -21,6 +21,8 @@ import AuthContext from "~/security/AuthContext";
 import * as sizeService from "~/services/sizeService";
 import * as colorService from "~/services/colorService";
 import {Checkbox} from "primereact/checkbox";
+import {MDBInputGroup, MDBTable, MDBTableBody, MDBTableHead} from "mdb-react-ui-kit";
+import {Editor} from "primereact/editor";
 
 const Products = () => {
     let newProduct = {
@@ -30,6 +32,12 @@ const Products = () => {
         category: {},
         variants: []
     };
+    let newVariant = {
+        size: {},
+        color: {},
+        price: null,
+        quantity: null
+    }
     const [file, setFile] = useState('');
     const [productList, setProductList] = useState([]);
     const [categories, setCategories] = useState([]);
@@ -37,6 +45,7 @@ const Products = () => {
     const [checkedSizes, setCheckedSizes] = useState([]);
     const [colors, setColors] = useState([]);
     const [checkedColors, setCheckedColors] = useState([]);
+    const [variants, setVariants] = useState([]);
     const [productDialog, setProductDialog] = useState(false);
     const [deleteProductDialog, setDeleteProductDialog] = useState(false);
     const [deleteProductListDialog, setDeleteProductListDialog] = useState(false);
@@ -108,7 +117,11 @@ const Products = () => {
 
     const handleChangeSize = (e) => {
         if (e.target.checked) {
-            setCheckedSizes([...checkedSizes, e.target.value])
+            const rowData = {
+                ...e.target.value,
+                variants: [...checkedColors]
+            };
+            setCheckedSizes([...checkedSizes, rowData]);
         } else {
             setCheckedSizes(checkedSizes.filter((item) => item.id !== e.target.value.id));
         }
@@ -130,6 +143,14 @@ const Products = () => {
 
         setProduct(_product);
     };
+
+    function handleOnChangeEditor(htmlValue) {
+        let _product = {...product};
+
+        _product.description = htmlValue;
+
+        setProduct(_product);
+    }
 
     const handleOnBlurInputName = (e) => {
         setErrorByName('');
@@ -381,13 +402,18 @@ const Products = () => {
                 </div>
 
                 <div className="field">
-                    <label htmlFor="description" className="font-bold">
-                        Description
-                    </label>
-                    <InputTextarea id="description" onChange={(e) => handleOnChangeInput(e, 'description')}
-                                   required rows={3} cols={20} value={product.description} maxLength={2000}
-                                   title={"Mô tả sản phẩm không vượt quá 2000 ký tự."}
-                    />
+                    {/*<label htmlFor="description" className="font-bold">*/}
+                    {/*    Description*/}
+                    {/*</label>*/}
+                    {/*<InputTextarea id="description" onChange={(e) => handleOnChangeInput(e, 'description')}*/}
+                    {/*               required rows={3} cols={20} value={product.description} maxLength={2000}*/}
+                    {/*               title={"Mô tả sản phẩm không vượt quá 2000 ký tự."}*/}
+                    {/*/>*/}
+                    <div className="card">
+                        <Editor value={product.description}
+                                onTextChange={(e) => handleOnChangeEditor(e.htmlValue)}
+                                style={{ height: '320px' }} />
+                    </div>
                 </div>
 
                 <div className="field">
@@ -447,35 +473,59 @@ const Products = () => {
                     </div>
                 </div>
 
-                <div className="field formgrid grid">
-                    {checkedSizes &&
-                        <table className="table">
-                            <tr>
-                                <th scope="col">Size</th>
-                                <th>Color</th>
-                                <th>Price</th>
-                                <th>Quantity</th>
-                            </tr>
-                            {checkedSizes && checkedSizes.map(size => (
-                                <>
+                <div className="field">
+                    <div className="formgrid grid">
+                        {checkedSizes &&
+                            <MDBTable align="middle">
+                                <MDBTableHead align="middle">
                                     <tr>
-                                        <td rowSpan={checkedColors.length}>{size.name}</td>
-                                        <td>{checkedColors[0] ? checkedColors[0].name : ''}</td>
-                                        <td><input/></td>
-                                        <td><input/></td>
+                                        <th scope="col">Size</th>
+                                        <th scope="col">Color</th>
+                                        <th scope="col">Price</th>
+                                        <th scope="col">Quantity</th>
                                     </tr>
-                                    {checkedColors.map((color, index) => {
-                                        return <>{index !== 0 &&
-                                            <tr>
-                                                <td>{color.name}</td>
-                                                <td><input/></td>
-                                                <td><input/></td>
-                                            </tr>}</>
-                                    })}
-                                </>
-                            ))}
-                        </table>
-                    }
+                                </MDBTableHead>
+                                <MDBTableBody align="middle">
+                                    {checkedSizes && checkedSizes.map(size => (
+                                        <>
+                                            <tr className="pb-3">
+                                                {checkedColors.length
+                                                    ? <td rowSpan={checkedColors.length}>{size.name}</td>
+                                                    : <td>{size.name}</td>}
+                                                <td>{checkedColors[0] && checkedColors[0].name}</td>
+                                                <td>
+                                                    <MDBInputGroup textAfter='vnđ'>
+                                                        <input className='form-control' type='number' step="any" placeholder='Giá'/>
+                                                    </MDBInputGroup>
+                                                </td>
+                                                <td>
+                                                    <MDBInputGroup textAfter='cái'>
+                                                        <input className='form-control' type='number' placeholder='Số lượng'/>
+                                                    </MDBInputGroup>
+                                                </td>
+                                            </tr>
+                                            {checkedColors.map((color, index) => {
+                                                return <>{index !== 0 &&
+                                                    <tr className="pb-3">
+                                                        <td>{color.name}</td>
+                                                        <td>
+                                                            <MDBInputGroup textAfter='vnđ'>
+                                                                <input className='form-control' type='number' step="any" placeholder='Giá'/>
+                                                            </MDBInputGroup>
+                                                        </td>
+                                                        <td>
+                                                            <MDBInputGroup  textAfter='cái'>
+                                                                <input className='form-control' type='number' placeholder='Số lượng'/>
+                                                            </MDBInputGroup>
+                                                        </td>
+                                                    </tr>}</>
+                                            })}
+                                        </>
+                                    ))}
+                                </MDBTableBody>
+                            </MDBTable>
+                        }
+                    </div>
                 </div>
 
 
