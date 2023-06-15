@@ -32,10 +32,9 @@ const Products = () => {
         variants: []
     };
     let newVariant = {
-        size: {},
-        color: {},
-        price: null,
-        quantity: null
+        name: '',
+        price: '',
+        quantity: '',
     }
     const [file, setFile] = useState('');
     const [productList, setProductList] = useState([]);
@@ -43,8 +42,7 @@ const Products = () => {
     const [sizes, setSizes] = useState([]);
     const [checkedSizes, setCheckedSizes] = useState([]);
     const [colors, setColors] = useState([]);
-    const [checkedColors, setCheckedColors] = useState([]);
-    // const [variants, setVariants] = useState([]);
+    const [checkedColors, setCheckedColors] = useState(() => [newVariant]);
     const [productDialog, setProductDialog] = useState(false);
     const [deleteProductDialog, setDeleteProductDialog] = useState(false);
     const [deleteProductListDialog, setDeleteProductListDialog] = useState(false);
@@ -133,32 +131,49 @@ const Products = () => {
                 price: '',
                 quantity: '',
             }
-            setCheckedColors([...checkedColors, colorData]);
+            let _checkedColors = [];
+            setCheckedColors(prevState => {
+                if (!prevState[0].name) {
+                    const [first, ..._prevState] = prevState;
+                    _checkedColors = [..._prevState, colorData];
+                    return _checkedColors;
+                } else {
+                    _checkedColors = [...prevState, colorData];
+                    return _checkedColors;
+                }
+            });
             const _checkedSizes = checkedSizes.map((item) => {
                 const newItem = {...item}
-                newItem.variants = [...checkedColors, colorData];
+                newItem.variants = [..._checkedColors];
                 return newItem;
             });
             setCheckedSizes(_checkedSizes);
+            console.log(_checkedSizes)
         } else {
+            console.log(checkedColors)
             const newCheckedColors = checkedColors.filter((item) => item.id !== e.target.value.id);
             setCheckedColors(newCheckedColors);
             const _checkedSizes = checkedSizes.map((item) => {
                 const newItem = {...item}
+                console.log(newCheckedColors)
                 newItem.variants = [...newCheckedColors];
                 return newItem;
             });
             setCheckedSizes(_checkedSizes);
+            console.log(_checkedSizes)
         }
     }
 
     const handleChangeVariantInput = (e, indexSize, indexVariant, field) => {
-        const _checkedSizes = checkedSizes.map((sizeItem, rowIndex) => {
+        setCheckedSizes(prevState => prevState.map((sizeItem, rowIndex) => {
             if (rowIndex === indexSize) {
                 const {variants, ...props} = sizeItem;
-                const newVariants = variants.map((variantItem, columnIndex) => {
+                const newVariants = variants?.map((variantItem, columnIndex) => {
                     if (columnIndex === indexVariant) {
-                        variantItem[field] = e.target.value;
+                        const _variantItem = {...variantItem}
+                        _variantItem[field] = e.target.value;
+                        return _variantItem;
+                    } else {
                         return variantItem;
                     }
                 })
@@ -166,9 +181,9 @@ const Products = () => {
             } else {
                 return sizeItem;
             }
-        })
-        console.log(_checkedSizes);
-        setCheckedSizes(_checkedSizes);
+        }));
+        // console.log(_checkedSizes);
+        // setCheckedSizes(_checkedSizes);
     }
 
     const handleOnChangeInput = (e, name) => {
@@ -516,17 +531,17 @@ const Products = () => {
                                 <MDBTableBody align="middle">
                                     {checkedSizes && checkedSizes.map(({id, name, variants}, indexSize) => (
                                         <>
-                                            <tr className="pb-3" key={id}>
+                                            <tr className="pb-3" key={indexSize}>
                                                 {checkedColors.length
                                                     ? <td rowSpan={checkedColors.length}>{name}</td>
                                                     : <td>{name}</td>}
-                                                <td>{variants && variants.length !== 0 && variants[0].name}</td>
+                                                <td>{variants && variants[0]?.name}</td>
                                                 <td>
                                                     <MDBInputGroup textAfter='vnđ'>
                                                         <input
                                                             onChange={e => handleChangeVariantInput(e, indexSize, 0, "price")}
                                                             className='form-control' type='number' step="any"
-                                                            placeholder='Nhập giá'/>
+                                                            placeholder='Nhập giá' value={variants && variants[0]?.price}/>
                                                     </MDBInputGroup>
                                                 </td>
                                                 <td>
@@ -534,14 +549,18 @@ const Products = () => {
                                                         <input
                                                             onChange={e => handleChangeVariantInput(e, indexSize, 0, "quantity")}
                                                             className='form-control' type='number'
-                                                            placeholder='Nhập số lượng'/>
+                                                            placeholder='Nhập số lượng' value={variants && variants[0]?.quantity}/>
                                                     </MDBInputGroup>
                                                 </td>
                                             </tr>
-                                            {variants && variants.map(({name, price, quantity}, indexVariant) => {
+                                            {variants && variants.map(({
+                                                                           name: color,
+                                                                           price,
+                                                                           quantity
+                                                                       }, indexVariant) => {
                                                 return <>{indexVariant !== 0 &&
                                                     <tr className="pb-3" key={indexVariant}>
-                                                        <td>{name}</td>
+                                                        <td>{color}</td>
                                                         <td>
                                                             <MDBInputGroup textAfter='vnđ'>
                                                                 <input

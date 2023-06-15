@@ -58,8 +58,8 @@ const Sidebar = () => {
                                 className="text-uppercase"
                                 tag={NavLink}
                                 to={to}
-                                activeClassName="active"
-                                exact={exact}
+                                // activeClassName="active"
+                                // exact={exact}
                             >
                                 <Icon className={bem.e('nav-item-icon')}/>
                                 <span className="">{name}</span>
@@ -92,8 +92,8 @@ const Sidebar = () => {
                                     className="text-uppercase"
                                     tag={NavLink}
                                     to={to}
-                                    activeClassName="active"
-                                    exact={exact}
+                                    // activeClassName="active"
+                                    // exact={exact}
                                 >
                                     <Icon className={bem.e('nav-item-icon')}/>
                                     <span className="">{name}</span>
