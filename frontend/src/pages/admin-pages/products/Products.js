@@ -42,7 +42,7 @@ const Products = () => {
     const [sizes, setSizes] = useState([]);
     const [checkedSizes, setCheckedSizes] = useState([]);
     const [colors, setColors] = useState([]);
-    const [checkedColors, setCheckedColors] = useState(() => [newVariant]);
+    const [checkedColors, setCheckedColors] = useState(() => [{...newVariant}]);
     const [productDialog, setProductDialog] = useState(false);
     const [deleteProductDialog, setDeleteProductDialog] = useState(false);
     const [deleteProductListDialog, setDeleteProductListDialog] = useState(false);
@@ -116,7 +116,7 @@ const Products = () => {
         if (e.target.checked) {
             const sizeData = {
                 ...e.target.value,
-                variants: [...checkedColors]
+                variants: checkedColors.map(item => ({...item}))
             };
             setCheckedSizes([...checkedSizes, sizeData]);
         } else {
@@ -127,71 +127,48 @@ const Products = () => {
     const handleChangeColor = (e) => {
         if (e.target.checked) {
             const colorData = {
-                ...e.target.value,
-                price: '',
                 quantity: '',
+                price: '',
+                ...e.target.value,
             }
-            let _checkedColors = [];
-            setCheckedColors(prevState => {
-                if (!prevState[0].name) {
-                    const [first, ..._prevState] = prevState;
-                    _checkedColors = [..._prevState, colorData];
-                    return _checkedColors;
-                } else {
-                    _checkedColors = [...prevState, colorData];
-                    return _checkedColors;
-                }
-            });
-            const _checkedSizes = checkedSizes.map((item) => {
-                const newItem = {...item}
-                newItem.variants = [..._checkedColors];
-                return newItem;
-            });
-            setCheckedSizes(_checkedSizes);
-            console.log(_checkedSizes)
+            if (!checkedColors[0]?.name) {
+                checkedColors.shift();
+            }
+            checkedColors.push({...colorData});
+            setCheckedColors(checkedColors);
+            setCheckedSizes(checkedSizes.map((item) => {
+                item.variants = checkedColors.map(item => ({...item}))
+                return item;
+            }));
         } else {
-            console.log(checkedColors)
             const newCheckedColors = checkedColors.filter((item) => item.id !== e.target.value.id);
             setCheckedColors(newCheckedColors);
-            const _checkedSizes = checkedSizes.map((item) => {
-                const newItem = {...item}
-                console.log(newCheckedColors)
-                newItem.variants = [...newCheckedColors];
-                return newItem;
-            });
-            setCheckedSizes(_checkedSizes);
-            console.log(_checkedSizes)
+            setCheckedSizes(checkedSizes.map((item) => {
+                item.variants = newCheckedColors.map(item => ({...item}))
+                return item;
+            }));
         }
     }
 
     const handleChangeVariantInput = (e, indexSize, indexVariant, field) => {
-        setCheckedSizes(prevState => prevState.map((sizeItem, rowIndex) => {
+        setCheckedSizes(checkedSizes.map((sizeItem, rowIndex) => {
             if (rowIndex === indexSize) {
-                const {variants, ...props} = sizeItem;
-                const newVariants = variants?.map((variantItem, columnIndex) => {
+                sizeItem.variants?.map((variantItem, columnIndex) => {
                     if (columnIndex === indexVariant) {
-                        const _variantItem = {...variantItem}
-                        _variantItem[field] = e.target.value;
-                        return _variantItem;
-                    } else {
-                        return variantItem;
+                        variantItem[field] = e.target.value;
                     }
+                    return variantItem;
                 })
-                return {...props, newVariants};
-            } else {
-                return sizeItem;
             }
+            return sizeItem;
         }));
-        // console.log(_checkedSizes);
-        // setCheckedSizes(_checkedSizes);
+        console.log(checkedSizes)
     }
 
     const handleOnChangeInput = (e, name) => {
         const val = (e.target && e.target.value) || '';
         let _product = {...product};
-
         _product[`${name}`] = val;
-
         setProduct(_product);
     };
 
@@ -529,7 +506,7 @@ const Products = () => {
                                     </tr>
                                 </MDBTableHead>
                                 <MDBTableBody align="middle">
-                                    {checkedSizes && checkedSizes.map(({id, name, variants}, indexSize) => (
+                                    {checkedSizes && checkedSizes.map(({id, name = "Lỗi", variants}, indexSize) => (
                                         <>
                                             <tr className="pb-3" key={indexSize}>
                                                 {checkedColors.length
@@ -541,7 +518,8 @@ const Products = () => {
                                                         <input
                                                             onChange={e => handleChangeVariantInput(e, indexSize, 0, "price")}
                                                             className='form-control' type='number' step="any"
-                                                            placeholder='Nhập giá' value={variants && variants[0]?.price}/>
+                                                            placeholder='Nhập giá'
+                                                            value={variants && variants[0]?.price}/>
                                                     </MDBInputGroup>
                                                 </td>
                                                 <td>
@@ -549,12 +527,13 @@ const Products = () => {
                                                         <input
                                                             onChange={e => handleChangeVariantInput(e, indexSize, 0, "quantity")}
                                                             className='form-control' type='number'
-                                                            placeholder='Nhập số lượng' value={variants && variants[0]?.quantity}/>
+                                                            placeholder='Nhập số lượng'
+                                                            value={variants && variants[0]?.quantity}/>
                                                     </MDBInputGroup>
                                                 </td>
                                             </tr>
                                             {variants && variants.map(({
-                                                                           name: color,
+                                                                           name: color = "Lỗi",
                                                                            price,
                                                                            quantity
                                                                        }, indexVariant) => {

@@ -1,5 +1,6 @@
 package com.lantern_business_webpp.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
 import javax.persistence.*;
@@ -11,6 +12,7 @@ import java.util.Collection;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties(value = {"variants", "isActive"})
 public class Size {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

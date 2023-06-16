@@ -28,6 +28,7 @@ public class ProductConverter implements GeneralConverter
                 .image(productRequestDTO.getImage())
                 .description(productRequestDTO.getDescription())
                 .category(productRequestDTO.getCategory())
+                .variants(productRequestDTO.getVariants())
                 .build();
     }
 

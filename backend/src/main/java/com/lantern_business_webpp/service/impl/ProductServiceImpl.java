@@ -1,11 +1,13 @@
 package com.lantern_business_webpp.service.impl;
 
 import com.lantern_business_webpp.converter.GeneralConverter;
+import com.lantern_business_webpp.entity.Variant;
 import com.lantern_business_webpp.payload.response.ProductResponseDTO;
 import com.lantern_business_webpp.entity.Category;
 import com.lantern_business_webpp.entity.Product;
 import com.lantern_business_webpp.payload.request.ProductRequestDTO;
 import com.lantern_business_webpp.repository.ProductRepository;
+import com.lantern_business_webpp.repository.VariantRepository;
 import com.lantern_business_webpp.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
+    private final VariantRepository variantRepository;
     private final GeneralConverter<Product, ProductRequestDTO, ProductResponseDTO> productConverter;
 
 
@@ -31,14 +34,11 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponseDTO save(ProductRequestDTO productRequestDTO) {
+        List<Variant> variants = (List<Variant>) productRequestDTO.getVariants();
+        variantRepository.saveAll(variants);
         Product product = productConverter.convertRequestToEntity(productRequestDTO);
         return productConverter.convertEntityToResponse(productRepository.save(product));
     }
-
-//    @Override
-//    public Optional<Product> findById(Long id) {
-//        return productRepository.findById(id);
-//    }
 
     @Override
     public void delete(Long id) {
