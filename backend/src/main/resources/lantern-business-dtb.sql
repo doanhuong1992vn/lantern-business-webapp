@@ -1,80 +1,184 @@
-create database lantern_business;
-use lantern_business;
-create table role
+CREATE DATABASE LANTERN_BUSINESS;
+USE LANTERN_BUSINESS;
+
+
+CREATE TABLE ROLE
 (
-    id          int primary key auto_increment,
-    name        varchar(50) not null,
-    description varchar(100)
+    ID          VARCHAR(36) PRIMARY KEY,
+    NAME        VARCHAR(50) NOT NULL,
+    DESCRIPTION VARCHAR(100) NOT NULL
 );
-insert into role (id, name, description)
-VALUES (1, "ROLE_ADMIN", "Quản trị viên"),
-       (2, "ROLE_CUSTOMER", "Khách hàng");
-create table user
+DELIMITER $$
+CREATE TRIGGER ROLE_INSERT_TRIGGER
+BEFORE INSERT ON ROLE
+FOR EACH ROW
+BEGIN
+  IF NEW.ID IS NULL THEN
+    SET NEW.ID = UUID();
+  END IF;
+END$$
+DELIMITER ;
+
+
+CREATE TABLE USER
 (
-    id             bigint primary key auto_increment,
-    active         boolean default true,
-    email          varchar(50) unique not null,
-    fullName       varchar(50)        not null,
-    password       text               not null,
-    phone          varchar(12) unique not null,
-    remember_token varchar(255),
-    username       varchar(20) unique not null
+    ID             VARCHAR(36) PRIMARY KEY,
+    ACTIVE         BOOLEAN DEFAULT TRUE,
+    EMAIL          VARCHAR(50) UNIQUE NOT NULL,
+    FULLNAME       VARCHAR(50)        NOT NULL,
+    PASSWORD       TEXT               NOT NULL,
+    PHONE          VARCHAR(12) UNIQUE NOT NULL,
+    REMEMBER_TOKEN VARCHAR(255),
+    USERNAME       VARCHAR(20) UNIQUE NOT NULL
 );
-insert into user (id, email, fullName, phone, username, password)
-VALUES (1, "huong@gmail.com", "ADMIN Đoàn Hưởng", "0888442448", "admin",
-        "$2a$10$/fEKrX3F3sRz/CMMCgIaXuYaM01ZamVlqvf4TeQxOUupGUDBkpliK"),
-       (2, "test@gmail.com", "Test Customer", "0999999999", "khachtest",
+DELIMITER $$
+CREATE TRIGGER USER_INSERT_TRIGGER
+BEFORE INSERT ON USER
+FOR EACH ROW
+BEGIN
+  IF NEW.ID IS NULL THEN
+    SET NEW.ID = UUID();
+  END IF;
+END$$
+DELIMITER ;
+
+
+CREATE TABLE USERS_ROLES
+(
+    USER_ID VARCHAR(36),
+    ROLE_ID VARCHAR(36),
+    PRIMARY KEY (USER_ID, ROLE_ID)
+);
+
+
+CREATE TABLE CATEGORY
+(
+    ID     VARCHAR(36) PRIMARY KEY,
+    NAME   VARCHAR(50) NOT NULL,
+    ACTIVE BOOLEAN DEFAULT TRUE
+);
+DELIMITER $$
+CREATE TRIGGER CATEGORY_INSERT_TRIGGER
+BEFORE INSERT ON CATEGORY
+FOR EACH ROW
+BEGIN
+  IF NEW.ID IS NULL THEN
+    SET NEW.ID = UUID();
+  END IF;
+END$$
+DELIMITER ;
+
+
+CREATE TABLE PRODUCT
+(
+    ID          VARCHAR(36) PRIMARY KEY,
+    NAME        VARCHAR(255) NOT NULL,
+    IMAGE       TEXT,
+    DESCRIPTION LONGBLOB,
+    ACTIVE      BOOLEAN DEFAULT TRUE,
+    IS_SHOW		BOOLEAN DEFAULT TRUE,
+    CATEGORY_ID VARCHAR(36),
+    FOREIGN KEY (CATEGORY_ID) REFERENCES CATEGORY (ID)
+);
+DELIMITER $$
+CREATE TRIGGER PRODUCT_INSERT_TRIGGER
+BEFORE INSERT ON PRODUCT
+FOR EACH ROW
+BEGIN
+  IF NEW.ID IS NULL THEN
+    SET NEW.ID = UUID();
+  END IF;
+END$$
+DELIMITER ;
+
+
+CREATE TABLE SIZE
+(
+    ID          VARCHAR(36) PRIMARY KEY,
+    NAME        VARCHAR(25) NOT NULL,
+    ACTIVE      BOOLEAN DEFAULT TRUE
+);
+DELIMITER $$
+CREATE TRIGGER SIZE_INSERT_TRIGGER
+BEFORE INSERT ON SIZE
+FOR EACH ROW
+BEGIN
+  IF NEW.ID IS NULL THEN
+    SET NEW.ID = UUID();
+  END IF;
+END$$
+DELIMITER ;
+
+
+CREATE TABLE COLOR
+(
+    ID          VARCHAR(36) PRIMARY KEY,
+    NAME        VARCHAR(25) NOT NULL,
+    ACTIVE      BOOLEAN DEFAULT TRUE
+);
+DELIMITER $$
+CREATE TRIGGER COLOR_INSERT_TRIGGER
+BEFORE INSERT ON COLOR
+FOR EACH ROW
+BEGIN
+  IF NEW.ID IS NULL THEN
+    SET NEW.ID = UUID();
+  END IF;
+END$$
+DELIMITER ;
+
+
+CREATE TABLE VARIANT
+(
+    ID          VARCHAR(36) PRIMARY KEY,
+    PRICE       DOUBLE NOT NULL CHECK ( PRICE >= 0 ),
+    QUANTITY    INT NOT NULL CHECK ( QUANTITY >= 0 ),
+    ACTIVE      BOOLEAN DEFAULT TRUE,
+    IS_SHOW		BOOLEAN DEFAULT TRUE,
+    PRODUCT_ID  VARCHAR(36),
+    SIZE_ID     VARCHAR(36),
+    COLOR_ID    VARCHAR(36),
+    FOREIGN KEY (PRODUCT_ID) REFERENCES PRODUCT(ID),
+    FOREIGN KEY (SIZE_ID) REFERENCES SIZE(ID),
+    FOREIGN KEY (COLOR_ID) REFERENCES COLOR(ID)
+);
+DELIMITER $$
+CREATE TRIGGER VARIANT_INSERT_TRIGGER
+BEFORE INSERT ON VARIANT
+FOR EACH ROW
+BEGIN
+  IF NEW.ID IS NULL THEN
+    SET NEW.ID = UUID();
+  END IF;
+END$$
+DELIMITER ;
+
+
+INSERT INTO ROLE (ID, NAME, DESCRIPTION)
+VALUES 	(UUID(), "ROLE_ADMIN", "Quản trị viên"),
+		(UUID(), "ROLE_CUSTOMER", "Khách hàng");
+SELECT ID FROM ROLE WHERE NAME = "ROLE_ADMIN" INTO @ID_ROLE_ADMIN;
+INSERT INTO USER (ID, EMAIL, FULLNAME, PHONE, USERNAME, PASSWORD)
+VALUES (UUID(), "huong@gmail.com", "ADMIN Đoàn Hưởng", "0888442448", "admin",
         "$2a$10$/fEKrX3F3sRz/CMMCgIaXuYaM01ZamVlqvf4TeQxOUupGUDBkpliK");
 # Mật khẩu: Huong@123
-create table users_roles
-(
-    user_id bigint,
-    role_id int,
-    primary key (user_id, role_id)
-);
-insert into users_roles (user_id, role_id)
-VALUES (1, 1),
-       (2, 2);
-create table category
-(
-    id     bigint primary key auto_increment,
-    name   varchar(50) not null,
-    active boolean default true
-);
-insert into category (name)
-values ("Đèn lồng tú cầu"),
+SELECT ID FROM USER WHERE PHONE = "0888442448" INTO @ID_LAST_USER;
+INSERT INTO USERS_ROLES (USER_ID, ROLE_ID) VALUES (@ID_LAST_USER, @ID_ROLE_ADMIN);
+INSERT INTO CATEGORY (NAME)
+VALUES ("Đèn lồng tú cầu"),
        ("Đèn lồng ngôi sao"),
        ("Đèn lồng hội an"),
        ("Đèn lồng giấy");
-create table product
-(
-    id          bigint primary key auto_increment,
-    name        varchar(255) not null,
-    image       text,
-    description text,
-    active      boolean default true,
-    category_id bigint,
-    foreign key (category_id) references category (id)
-);
-create table size
-(
-    id          bigint primary key auto_increment,
-    name        varchar(25) not null
-);
-create table color
-(
-    id          bigint primary key auto_increment,
-    name        varchar(25) not null
-);
-create table variant
-(
-    id          bigint primary key auto_increment,
-    price       double not null CHECK ( price >= 0 ),
-    quantity    int not null CHECK ( quantity >= 0 ),
-    product_id  bigint,
-    size_id     bigint,
-    color_id    bigint,
-    foreign key (product_id) references product(id),
-    foreign key (size_id) references size(id),
-    foreign key (color_id) references color(id)
-);
+INSERT INTO SIZE (NAME)
+VALUES ("Nhỏ"),
+       ("Trung"),
+       ("Lớn");
+INSERT INTO COLOR (NAME)
+VALUES ("Xanh lá cây"),
+       ("Đỏ"),
+       ("Tím"),
+       ("Xanh ngọc"),
+       ("Trắng"),
+       ("Cam"),
+       ("Vàng");
+       SHOW VARIABLES LIKE 'character_set%';

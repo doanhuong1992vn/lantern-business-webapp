@@ -28,11 +28,11 @@ const Products = () => {
         name: '',
         image: null,
         description: '',
-        category: {},
+        category: '',
         variants: []
     };
     let newVariant = {
-        name: '',
+        color: '',
         price: '',
         quantity: '',
     }
@@ -77,6 +77,7 @@ const Products = () => {
                 .catch(() => navigate("/error-403"));
         }
     }, [user]);
+    console.log(colors)
 
     const exportCSV = () => {
         dt.current.exportCSV();
@@ -91,7 +92,12 @@ const Products = () => {
 
     const handleOpenEditProductDialog = (product) => {
         setSelectedCategory(true);
-        setProduct({...product});
+        productService.findById(product.id, user.token)
+            .then(response => {
+                setProduct(response.data);
+            })
+            .catch(err => console.log(err))
+        // setProduct({...product});
         setProductDialog(true);
     };
 
@@ -108,7 +114,7 @@ const Products = () => {
     const handleOnChangeRadioCategory = (e) => {
         setSelectedCategory(true);
         let _product = {...product};
-        _product['category'] = e.value;
+        _product['category'] = e.value.category;
         setProduct(_product);
     };
 
@@ -126,15 +132,17 @@ const Products = () => {
 
     const handleChangeColor = (e) => {
         if (e.target.checked) {
-            const colorData = {
+            const variant = {
+                idVariant: null,
+                color: '',
                 quantity: '',
                 price: '',
                 ...e.target.value,
             }
-            if (!checkedColors[0]?.name) {
+            if (!checkedColors[0]?.color) {
                 checkedColors.shift();
             }
-            checkedColors.push({...colorData});
+            checkedColors.push({...variant});
             setCheckedColors(checkedColors);
             setCheckedSizes(checkedSizes.map((item) => {
                 item.variants = checkedColors.map(item => ({...item}))
@@ -165,7 +173,7 @@ const Products = () => {
         console.log(checkedSizes)
     }
 
-    const handleOnChangeInput = (e, name) => {
+    const handleChangeProductInput = (e, name) => {
         const val = (e.target && e.target.value) || '';
         let _product = {...product};
         _product[`${name}`] = val;
@@ -199,6 +207,21 @@ const Products = () => {
         if (product.name.trim()) {
             let _productList = [...productList];
             let _product = {...product};
+            const variants = [];
+            console.log(checkedSizes);
+            checkedSizes.map(item => {
+                item.variants.map(variant => {
+                    const _variant = {
+                        id: variant.idVariant || null,
+                        size: item.size,
+                        color: variant.color,
+                        price: variant.price,
+                        quantity: variant.quantity
+                    }
+                    variants.push(_variant);
+                })
+            });
+            _product.variants = variants;
             if (file) {
                 const storageRef = ref(storage, `/files/${file.name}`);
                 const uploadTask = uploadBytesResumable(storageRef, file);
@@ -388,7 +411,7 @@ const Products = () => {
                     <Column selectionMode="multiple" exportable={true}></Column>
                     <Column field="name" header="Name" sortable style={{minWidth: '16rem'}}></Column>
                     <Column field="image" header="Image" body={imageBodyTemplate}></Column>
-                    <Column field="category.name" header="Category" sortable style={{minWidth: '10rem'}}></Column>
+                    <Column field="category" header="Category" sortable style={{minWidth: '10rem'}}></Column>
                     <Column body={actionBodyTemplate} exportable={false} style={{minWidth: '12rem'}}></Column>
                 </DataTable>
             </div>
@@ -417,7 +440,7 @@ const Products = () => {
                     <label htmlFor="name" className="font-bold">
                         Name <sup style={{color: "red"}}>*</sup>
                     </label>
-                    <InputText id="name" value={product.name} onChange={(e) => handleOnChangeInput(e, 'name')}
+                    <InputText id="name" value={product.name} onChange={(e) => handleChangeProductInput(e, 'name')}
                                className={classNames({'p-invalid': submitted && !product.name})} required
                                onBlur={handleOnBlurInputName} maxLength={50}
                                title={"Tên sản phẩm không được vượt quá 50 ký tự"}
@@ -451,10 +474,10 @@ const Products = () => {
                             <div className="field-radiobutton col-6 mt-3" key={category.id}>
                                 <RadioButton inputId={category.id} name="category" value={category}
                                              onChange={handleOnChangeRadioCategory}
-                                             checked={product.category.id === category.id}
+                                             checked={product.category === category.category}
                                              required={true}
                                 />
-                                <label htmlFor={category.id}>{category.name}</label>
+                                <label htmlFor={category.id}>{category.category}</label>
                             </div>
                         ))}
                     </div>
@@ -466,13 +489,13 @@ const Products = () => {
                             <label className="font-bold">
                                 Size
                             </label>
-                            {sizes.map((size) => (
-                                <div className="field-radiobutton col-6 mt-3" key={size.id}>
-                                    <Checkbox inputId={size.id} name="size" value={size}
+                            {sizes.map((item) => (
+                                <div className="field-radiobutton col-6 mt-3" key={item.id}>
+                                    <Checkbox inputId={item.id} name="size" value={item}
                                               onChange={handleChangeSize}
-                                              checked={checkedSizes.some(item => item.id === size.id)}
+                                              checked={checkedSizes.some(size => size.id === item.id)}
                                     />
-                                    <label htmlFor={size.id}>{size.name}</label>
+                                    <label htmlFor={item.id}>{item.size}</label>
                                 </div>
                             ))}
                         </div>
@@ -480,13 +503,13 @@ const Products = () => {
                             <label className="font-bold">
                                 Color
                             </label>
-                            {colors.map((color) => (
-                                <div className="field-radiobutton col-6 mt-3" key={color.id}>
-                                    <Checkbox inputId={color.id} name="size" value={color}
+                            {colors.map((item) => (
+                                <div className="field-radiobutton col-6 mt-3" key={item.id}>
+                                    <Checkbox inputId={item.id} name="size" value={item}
                                               onChange={handleChangeColor}
-                                              checked={checkedColors.some(item => item.id === color.id)}
+                                              checked={checkedColors.some(color => color.id === item.id)}
                                     />
-                                    <label htmlFor={color.id}>{color.name}</label>
+                                    <label htmlFor={item.id}>{item.color}</label>
                                 </div>
                             ))}
                         </div>
@@ -506,19 +529,19 @@ const Products = () => {
                                     </tr>
                                 </MDBTableHead>
                                 <MDBTableBody align="middle">
-                                    {checkedSizes && checkedSizes.map(({id, name = "Lỗi", variants}, indexSize) => (
+                                    {checkedSizes && checkedSizes.map(({id, size, variants}, indexSize) => (
                                         <>
                                             <tr className="pb-3" key={indexSize}>
                                                 {checkedColors.length
-                                                    ? <td rowSpan={checkedColors.length}>{name}</td>
-                                                    : <td>{name}</td>}
-                                                <td>{variants && variants[0]?.name}</td>
+                                                    ? <td rowSpan={checkedColors.length}>{size}</td>
+                                                    : <td>{size}</td>}
+                                                <td>{variants && variants[0]?.color}</td>
                                                 <td>
                                                     <MDBInputGroup textAfter='vnđ'>
                                                         <input
                                                             onChange={e => handleChangeVariantInput(e, indexSize, 0, "price")}
                                                             className='form-control' type='number' step="any"
-                                                            placeholder='Nhập giá'
+                                                            placeholder='Nhập giá' min={0}
                                                             value={variants && variants[0]?.price}/>
                                                     </MDBInputGroup>
                                                 </td>
@@ -527,13 +550,13 @@ const Products = () => {
                                                         <input
                                                             onChange={e => handleChangeVariantInput(e, indexSize, 0, "quantity")}
                                                             className='form-control' type='number'
-                                                            placeholder='Nhập số lượng'
+                                                            placeholder='Nhập số lượng' min={0}
                                                             value={variants && variants[0]?.quantity}/>
                                                     </MDBInputGroup>
                                                 </td>
                                             </tr>
                                             {variants && variants.map(({
-                                                                           name: color = "Lỗi",
+                                                                           color,
                                                                            price,
                                                                            quantity
                                                                        }, indexVariant) => {
@@ -544,7 +567,7 @@ const Products = () => {
                                                             <MDBInputGroup textAfter='vnđ'>
                                                                 <input
                                                                     onChange={e => handleChangeVariantInput(e, indexSize, indexVariant, "price")}
-                                                                    value={price} className='form-control'
+                                                                    value={price} className='form-control' min={0}
                                                                     type='number' step="any" placeholder='Nhập giá'/>
                                                             </MDBInputGroup>
                                                         </td>
@@ -552,7 +575,7 @@ const Products = () => {
                                                             <MDBInputGroup textAfter='cái'>
                                                                 <input
                                                                     onChange={e => handleChangeVariantInput(e, indexSize, indexVariant, "quantity")}
-                                                                    value={quantity} className='form-control'
+                                                                    value={quantity} className='form-control' min={0}
                                                                     type='number' placeholder='Nhập số lượng'/>
                                                             </MDBInputGroup>
                                                         </td>

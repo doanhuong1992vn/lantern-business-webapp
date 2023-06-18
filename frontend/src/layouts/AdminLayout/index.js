@@ -1,18 +1,9 @@
-import React, { useEffect, useRef } from 'react';
-// import { Content, Footer, Header, Sidebar } from '~/components/Layout';
-import {
-    MdImportantDevices,
-    // MdCardGiftcard,
-    MdLoyalty,
-} from 'react-icons/md';
+import React, {useEffect} from 'react';
 import Header from "~/layouts/AdminLayout/Header";
 import Content from "~/layouts/AdminLayout/Content";
 import Sidebar from "~/layouts/AdminLayout/Sidebar";
-// import NotificationSystem from 'react-notification-system';
-// import { NOTIFICATION_SYSTEM_STYLE } from '~/utils/constants';
 
 const MainLayout = ({ breakpoint, children }) => {
-    // const notificationSystemRef = useRef(null);
 
     useEffect(() => {
         checkBreakpoint(breakpoint);

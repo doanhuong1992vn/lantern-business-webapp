@@ -4,7 +4,7 @@ import httpRequest from '~/utils/httpRequest';
 export const getAll = async (token) => {
 
     try {
-        return await httpRequest.get('/admin/colors', {
+        return await httpRequest.get('/colors', {
             "headers" : {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`

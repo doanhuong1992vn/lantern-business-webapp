@@ -2,54 +2,66 @@ import httpRequest from '~/utils/httpRequest';
 
 export const getAll = async (token) => {
     try {
-        return await httpRequest.get('/admin/products', {
+        return await httpRequest.get('/products', {
             "headers" : {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             }
         });
     } catch (error) {
-        console.log("Axios lỗi getAll products :" + error);
+        console.log("Axios lỗi productService getAll :" + error);
+    }
+};
+
+export const findById = async (id, token) => {
+    try {
+        return await httpRequest.get(`/products/${id}`, {
+            "headers" : {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+    } catch (error) {
+        console.log("Axios lỗi productService findById  :" + error);
     }
 };
 
 export const save = async (product, token) => {
     try {
-        console.log('httpRequest call save product: ' + httpRequest)
-        return await httpRequest.post("/admin/products", product, {
+        return await httpRequest.post("/auth/products", product, {
             "headers" : {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             }
         });
     } catch (error) {
-        console.log("Axios lỗi save product :" + error);
+        console.log("Axios lỗi productService save :" + error);
     }
 }
 
 export const update = async (product, token) => {
     try {
-        return await httpRequest.put("/admin/products", product, {
+        return await httpRequest.put("/auth/products", product, {
             "headers" : {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             }
         });
     } catch (error) {
-        console.log("Axios lỗi update product :" + error);
+        console.log("Axios lỗi productService update :" + error);
     }
 }
 
 export const deleteById = async (id, token) => {
     try {
-        await httpRequest.delete(`/admin/products/${id}`, {
+        await httpRequest.delete(`/auth/products/${id}`, {
             "headers" : {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             }
         });
     } catch (error) {
-        console.log("Axios lỗi delete product:" + error);
+        console.log("Axios lỗi productService delete:" + error);
     }
 }
 
