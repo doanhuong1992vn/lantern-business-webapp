@@ -1,5 +1,6 @@
 package com.lantern_business_webapp.payload.request;
 
+import com.lantern_business_webapp.payload.VariantDTO;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
@@ -19,5 +20,5 @@ public class ProductRequestDTO {
     private String image;
     private String description;
     private String category;
-    private List<VariantRequestDTO> variants;
+    private List<VariantDTO> variants;
 }

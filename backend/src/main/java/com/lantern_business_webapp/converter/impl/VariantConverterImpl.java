@@ -2,7 +2,7 @@ package com.lantern_business_webapp.converter.impl;
 
 import com.lantern_business_webapp.converter.VariantConverter;
 import com.lantern_business_webapp.entity.Variant;
-import com.lantern_business_webapp.payload.request.VariantRequestDTO;
+import com.lantern_business_webapp.payload.VariantDTO;
 import com.lantern_business_webapp.repository.ColorRepository;
 import com.lantern_business_webapp.repository.SizeRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,20 +17,26 @@ public class VariantConverterImpl implements VariantConverter {
     private final ColorRepository colorRepository;
 
     @Override
-    public Variant convertEntityToResponse(Variant source) {
-        return null;
+    public VariantDTO convertEntityToResponse(Variant variant) {
+        return VariantDTO.builder()
+                .id(variant.getId().toString())
+                .color(variant.getColor().getName())
+                .size(variant.getSize().getName())
+                .quantity(variant.getQuantity())
+                .price(variant.getPrice())
+                .build();
     }
 
     @Override
-    public Variant convertRequestToEntity(VariantRequestDTO variantRequestDTO) {
+    public Variant convertRequestToEntity(VariantDTO variantDTO) {
         return Variant.builder()
-                .id(variantRequestDTO.getId() == null
+                .id(variantDTO.getId() == null
                         ? UUID.randomUUID()
-                        : UUID.fromString(variantRequestDTO.getId()))
-                .size(sizeRepository.findByNameAndActiveTrue(variantRequestDTO.getSize()))
-                .color(colorRepository.findByNameAndActiveTrue(variantRequestDTO.getColor()))
-                .price(variantRequestDTO.getPrice())
-                .quantity(variantRequestDTO.getQuantity())
+                        : UUID.fromString(variantDTO.getId()))
+                .size(sizeRepository.findByNameAndActiveTrue(variantDTO.getSize()))
+                .color(colorRepository.findByNameAndActiveTrue(variantDTO.getColor()))
+                .price(variantDTO.getPrice())
+                .quantity(variantDTO.getQuantity())
                 .active(true)
                 .isShow(true)
                 .build();

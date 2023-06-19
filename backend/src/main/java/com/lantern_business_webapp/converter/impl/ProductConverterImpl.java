@@ -1,6 +1,7 @@
 package com.lantern_business_webapp.converter.impl;
 
 import com.lantern_business_webapp.converter.ProductConverter;
+import com.lantern_business_webapp.converter.VariantConverter;
 import com.lantern_business_webapp.entity.Product;
 import com.lantern_business_webapp.payload.request.ProductRequestDTO;
 import com.lantern_business_webapp.payload.response.DetailProductResponseDTO;
@@ -15,6 +16,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ProductConverterImpl implements ProductConverter {
     private final CategoryRepository categoryRepository;
+    private final VariantConverter variantConverter;
 
     @Override
     public DetailProductResponseDTO convertEntityToDetailResponse(Product product) {
@@ -27,7 +29,9 @@ public class ProductConverterImpl implements ProductConverter {
                 .image(product.getImage())
                 .category(product.getCategory().getName())
                 .description(product.getDescription())
-                .variants(product.getVariants().stream().toList())
+                .variants(product.getVariants()
+                        .stream().map(variantConverter::convertEntityToResponse)
+                        .toList())
                 .build();
     }
 

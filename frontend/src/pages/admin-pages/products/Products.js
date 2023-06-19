@@ -31,18 +31,13 @@ const Products = () => {
         category: '',
         variants: []
     };
-    let newVariant = {
-        color: '',
-        price: '',
-        quantity: '',
-    }
     const [file, setFile] = useState('');
     const [productList, setProductList] = useState([]);
     const [categories, setCategories] = useState([]);
     const [sizes, setSizes] = useState([]);
     const [checkedSizes, setCheckedSizes] = useState([]);
     const [colors, setColors] = useState([]);
-    const [checkedColors, setCheckedColors] = useState(() => [{...newVariant}]);
+    const [checkedColors, setCheckedColors] = useState(() => []);
     const [productDialog, setProductDialog] = useState(false);
     const [deleteProductDialog, setDeleteProductDialog] = useState(false);
     const [deleteProductListDialog, setDeleteProductListDialog] = useState(false);
@@ -64,20 +59,19 @@ const Products = () => {
             navigate("/error-403");
         } else {
             productService.getAll(user.token)
-                .then((response) => setProductList(response.data))
-                .catch(() => navigate("/error-403"));
+                .then(response => setProductList(response.data))
+                .catch(err => console.log(err));
             categoryService.getAll(user.token)
-                .then((response) => setCategories(response.data))
-                .catch(() => navigate("/error-403"));
+                .then(response => setCategories(response.data))
+                .catch(err => console.log(err));
             sizeService.getAll(user.token)
-                .then((response) => setSizes(response.data))
-                .catch(() => navigate("/error-403"));
+                .then(response => setSizes(response.data))
+                .catch(err => console.log(err));
             colorService.getAll(user.token)
-                .then((response) => setColors(response.data))
-                .catch(() => navigate("/error-403"));
+                .then(response => setColors(response.data))
+                .catch(err => console.log(err));
         }
     }, [user]);
-    console.log(colors)
 
     const exportCSV = () => {
         dt.current.exportCSV();
@@ -86,6 +80,8 @@ const Products = () => {
     const handleOpenNewProductDialog = () => {
         setSelectedCategory(false);
         setProduct(newProduct);
+        setCheckedColors([]);
+        setCheckedSizes([]);
         setSubmitted(false);
         setProductDialog(true);
     };
@@ -95,9 +91,25 @@ const Products = () => {
         productService.findById(product.id, user.token)
             .then(response => {
                 setProduct(response.data);
+                const _variants = response.data.variants;
+                const _checkedSizes = [];
+                const _checkedColors = [];
+                _variants.map(({size, ...variant}) => {
+                    if (_checkedColors.every(item => item.color !== variant.color)) {
+                        _checkedColors.push({color: variant.color});
+                    }
+                    if (_checkedSizes.every(item => item.size !== size)) {
+                        _checkedSizes.push({size, variants: [variant]});
+                    } else {
+                        _checkedSizes.find(item => item.size === size).variants.push(variant);
+                    }
+                });
+                console.log(_checkedColors)
+                console.log(_checkedSizes)
+                setCheckedColors(_checkedColors);
+                setCheckedSizes(_checkedSizes);
             })
             .catch(err => console.log(err))
-        // setProduct({...product});
         setProductDialog(true);
     };
 
@@ -120,27 +132,24 @@ const Products = () => {
 
     const handleChangeSize = (e) => {
         if (e.target.checked) {
+            console.log(e.target.value)
             const sizeData = {
-                ...e.target.value,
+                size: e.target.value,
                 variants: checkedColors.map(item => ({...item}))
             };
             setCheckedSizes([...checkedSizes, sizeData]);
         } else {
-            setCheckedSizes(checkedSizes.filter((item) => item.id !== e.target.value.id));
+            setCheckedSizes(checkedSizes.filter((item) => item.size !== e.target.value));
         }
     }
 
     const handleChangeColor = (e) => {
         if (e.target.checked) {
             const variant = {
-                idVariant: null,
-                color: '',
+                id: null,
+                color: e.target.value,
                 quantity: '',
                 price: '',
-                ...e.target.value,
-            }
-            if (!checkedColors[0]?.color) {
-                checkedColors.shift();
             }
             checkedColors.push({...variant});
             setCheckedColors(checkedColors);
@@ -149,7 +158,7 @@ const Products = () => {
                 return item;
             }));
         } else {
-            const newCheckedColors = checkedColors.filter((item) => item.id !== e.target.value.id);
+            const newCheckedColors = checkedColors.filter((item) => item.color !== e.target.value);
             setCheckedColors(newCheckedColors);
             setCheckedSizes(checkedSizes.map((item) => {
                 item.variants = newCheckedColors.map(item => ({...item}))
@@ -211,12 +220,10 @@ const Products = () => {
             console.log(checkedSizes);
             checkedSizes.map(item => {
                 item.variants.map(variant => {
+                    console.log(variant)
                     const _variant = {
-                        id: variant.idVariant || null,
+                        ...variant,
                         size: item.size,
-                        color: variant.color,
-                        price: variant.price,
-                        quantity: variant.quantity
                     }
                     variants.push(_variant);
                 })
@@ -250,6 +257,8 @@ const Products = () => {
             }
             setProductList(_productList);
             setProductDialog(false);
+            setCheckedSizes([]);
+            setCheckedColors([]);
             setProduct(newProduct);
             setFile(null);
         } else {
@@ -378,10 +387,10 @@ const Products = () => {
     );
 
     const productDialogFooter = (
-        <React.Fragment>
+        <div className="mt-5">
             <Button label="Cancel" icon="pi pi-times" outlined onClick={handleHideProductDialog}/>
             <Button label="Save" icon="pi pi-check" onClick={handleSaveProduct}/>
-        </React.Fragment>
+        </div>
     );
     const deleteProductDialogFooter = (
         <React.Fragment>
@@ -419,175 +428,177 @@ const Products = () => {
             <Dialog visible={productDialog} style={{width: '70rem'}} breakpoints={{'960px': '75vw', '641px': '90vw'}}
                     header={product.id ? "Product Detail" : "Create New Product"} modal className="p-fluid"
                     footer={productDialogFooter} onHide={handleHideProductDialog}>
-
-                <div className="mt-4">
-                    <label className="bg-light h6 font-bold" htmlFor="inputGroupFile02">
-                        {product.image ? "Choose other image" : "Choose image"}
-                    </label>
-                    <div className="input-group mb-3">
-                        <input type="file" onChange={handleOnChangeImage} accept="/image/*" className="form-control"
-                               id="inputGroupFile02"/>
-                    </div>
-                    {
-                        product.image && <img src={`${product.image}`} alt={product.name}
-                                              className="product-image block m-auto pb-3"
-                                              style={{width: '30rem'}}/>
-                    }
-
-                </div>
-
-                <div className="field">
-                    <label htmlFor="name" className="font-bold">
-                        Name <sup style={{color: "red"}}>*</sup>
-                    </label>
-                    <InputText id="name" value={product.name} onChange={(e) => handleChangeProductInput(e, 'name')}
-                               className={classNames({'p-invalid': submitted && !product.name})} required
-                               onBlur={handleOnBlurInputName} maxLength={50}
-                               title={"Tên sản phẩm không được vượt quá 50 ký tự"}
-                    />
-                    <small className="p-error">{
-                        errorByName || (submitted && !product.name && "* Tên sản phẩm không được để trống!")
-                    }</small>
-                </div>
-
-                <div className="field">
-                    <label className="font-bold">
-                        Description
-                    </label>
-                    <Editor value={product.description}
-                            onTextChange={(e) => handleOnChangeEditor(e.htmlValue)}
-                            style={{height: '320px'}}/>
-                </div>
-
-                <div className="field">
-                    <label className="font-bold">
-                        Category <sup style={{color: "red"}}>*</sup>
-                    </label>
-                    {
-                        submitted && !selectedCategory &&
-                        <div>
-                            <small className="p-error">* Vui lòng chọn danh mục cho sản phẩm!</small>
+                <div className="p-1 mb-5">
+                    <div className="mt-4">
+                        <label className="bg-light h6 font-bold" htmlFor="inputGroupFile02">
+                            {product.image ? "Choose other image" : "Choose image"}
+                        </label>
+                        <div className="input-group mb-3">
+                            <input type="file" onChange={handleOnChangeImage} accept="/image/*" className="form-control"
+                                   id="inputGroupFile02"/>
                         </div>
-                    }
-                    <div className="formgrid grid">
-                        {categories.map((category) => (
-                            <div className="field-radiobutton col-6 mt-3" key={category.id}>
-                                <RadioButton inputId={category.id} name="category" value={category}
-                                             onChange={handleOnChangeRadioCategory}
-                                             checked={product.category === category.category}
-                                             required={true}
-                                />
-                                <label htmlFor={category.id}>{category.category}</label>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                <div className="field">
-                    <div className="formgrid grid">
-                        <div className="field col">
-                            <label className="font-bold">
-                                Size
-                            </label>
-                            {sizes.map((item) => (
-                                <div className="field-radiobutton col-6 mt-3" key={item.id}>
-                                    <Checkbox inputId={item.id} name="size" value={item}
-                                              onChange={handleChangeSize}
-                                              checked={checkedSizes.some(size => size.id === item.id)}
-                                    />
-                                    <label htmlFor={item.id}>{item.size}</label>
-                                </div>
-                            ))}
-                        </div>
-                        <div className="field col">
-                            <label className="font-bold">
-                                Color
-                            </label>
-                            {colors.map((item) => (
-                                <div className="field-radiobutton col-6 mt-3" key={item.id}>
-                                    <Checkbox inputId={item.id} name="size" value={item}
-                                              onChange={handleChangeColor}
-                                              checked={checkedColors.some(color => color.id === item.id)}
-                                    />
-                                    <label htmlFor={item.id}>{item.color}</label>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-
-                <div className="field">
-                    <div className="formgrid grid">
-                        {checkedSizes &&
-                            <MDBTable align="middle">
-                                <MDBTableHead align="middle">
-                                    <tr>
-                                        <th scope="col">Size</th>
-                                        <th scope="col">Color</th>
-                                        <th scope="col">Price</th>
-                                        <th scope="col">Quantity</th>
-                                    </tr>
-                                </MDBTableHead>
-                                <MDBTableBody align="middle">
-                                    {checkedSizes && checkedSizes.map(({id, size, variants}, indexSize) => (
-                                        <>
-                                            <tr className="pb-3" key={indexSize}>
-                                                {checkedColors.length
-                                                    ? <td rowSpan={checkedColors.length}>{size}</td>
-                                                    : <td>{size}</td>}
-                                                <td>{variants && variants[0]?.color}</td>
-                                                <td>
-                                                    <MDBInputGroup textAfter='vnđ'>
-                                                        <input
-                                                            onChange={e => handleChangeVariantInput(e, indexSize, 0, "price")}
-                                                            className='form-control' type='number' step="any"
-                                                            placeholder='Nhập giá' min={0}
-                                                            value={variants && variants[0]?.price}/>
-                                                    </MDBInputGroup>
-                                                </td>
-                                                <td>
-                                                    <MDBInputGroup textAfter='cái'>
-                                                        <input
-                                                            onChange={e => handleChangeVariantInput(e, indexSize, 0, "quantity")}
-                                                            className='form-control' type='number'
-                                                            placeholder='Nhập số lượng' min={0}
-                                                            value={variants && variants[0]?.quantity}/>
-                                                    </MDBInputGroup>
-                                                </td>
-                                            </tr>
-                                            {variants && variants.map(({
-                                                                           color,
-                                                                           price,
-                                                                           quantity
-                                                                       }, indexVariant) => {
-                                                return <>{indexVariant !== 0 &&
-                                                    <tr className="pb-3" key={indexVariant}>
-                                                        <td>{color}</td>
-                                                        <td>
-                                                            <MDBInputGroup textAfter='vnđ'>
-                                                                <input
-                                                                    onChange={e => handleChangeVariantInput(e, indexSize, indexVariant, "price")}
-                                                                    value={price} className='form-control' min={0}
-                                                                    type='number' step="any" placeholder='Nhập giá'/>
-                                                            </MDBInputGroup>
-                                                        </td>
-                                                        <td>
-                                                            <MDBInputGroup textAfter='cái'>
-                                                                <input
-                                                                    onChange={e => handleChangeVariantInput(e, indexSize, indexVariant, "quantity")}
-                                                                    value={quantity} className='form-control' min={0}
-                                                                    type='number' placeholder='Nhập số lượng'/>
-                                                            </MDBInputGroup>
-                                                        </td>
-                                                    </tr>}</>
-                                            })}
-                                        </>
-                                    ))}
-                                </MDBTableBody>
-                            </MDBTable>
+                        {
+                            product.image && <img src={`${product.image}`} alt={product.name}
+                                                  className="product-image block m-auto pb-3"
+                                                  style={{width: '30rem'}}/>
                         }
+
+                    </div>
+
+                    <div className="field">
+                        <label htmlFor="name" className="font-bold">
+                            Name <sup style={{color: "red"}}>*</sup>
+                        </label>
+                        <InputText id="name" value={product.name} onChange={(e) => handleChangeProductInput(e, 'name')}
+                                   className={classNames({'p-invalid': submitted && !product.name})} required
+                                   onBlur={handleOnBlurInputName} maxLength={50}
+                                   title={"Tên sản phẩm không được vượt quá 50 ký tự"}
+                        />
+                        <small className="p-error">{
+                            errorByName || (submitted && !product.name && "* Tên sản phẩm không được để trống!")
+                        }</small>
+                    </div>
+
+                    <div className="field">
+                        <label className="font-bold">
+                            Description
+                        </label>
+                        <Editor value={product.description}
+                                onTextChange={(e) => handleOnChangeEditor(e.htmlValue)}
+                                style={{height: '50vh'}}/>
+                    </div>
+
+                    <div className="field">
+                        <label className="font-bold">
+                            Category <sup style={{color: "red"}}>*</sup>
+                        </label>
+                        {
+                            submitted && !selectedCategory &&
+                            <div>
+                                <small className="p-error">* Vui lòng chọn danh mục cho sản phẩm!</small>
+                            </div>
+                        }
+                        <div className="formgrid grid">
+                            {categories.map((category) => (
+                                <div className="field-radiobutton col-6 mt-3" key={category.id}>
+                                    <RadioButton inputId={category.id} name="category" value={category}
+                                                 onChange={handleOnChangeRadioCategory}
+                                                 checked={product.category === category.category}
+                                                 required={true}
+                                    />
+                                    <label htmlFor={category.id}>{category.category}</label>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="field">
+                        <div className="formgrid grid">
+                            <div className="field col">
+                                <label className="font-bold">
+                                    Size
+                                </label>
+                                {sizes.map(({size}) => (
+                                    <div className="field-radiobutton col-6 mt-3" key={size}>
+                                        <Checkbox inputId={size} name="size" value={size}
+                                                  onChange={handleChangeSize}
+                                                  checked={checkedSizes.some(current => current.size === size)}
+                                        />
+                                        <label htmlFor={size}>{size}</label>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="field col">
+                                <label className="font-bold">
+                                    Color
+                                </label>
+                                {colors.map(({color}) => (
+                                    <div className="field-radiobutton col-6 mt-3" key={color}>
+                                        <Checkbox inputId={color} name="size" value={color}
+                                                  onChange={handleChangeColor}
+                                                  checked={checkedColors.some(current => current.color === color)}
+                                        />
+                                        <label htmlFor={color}>{color}</label>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="field">
+                        <div className="formgrid grid">
+                            {checkedSizes.length !== 0 &&
+                                <MDBTable align="middle">
+                                    <MDBTableHead align="middle">
+                                        <tr>
+                                            <th scope="col">Size</th>
+                                            <th scope="col">Color</th>
+                                            <th scope="col">Price</th>
+                                            <th scope="col">Quantity</th>
+                                        </tr>
+                                    </MDBTableHead>
+                                    <MDBTableBody align="middle">
+                                        {checkedSizes && checkedSizes.map(({id, size, variants}, indexSize) => (
+                                            <>
+                                                <tr className="pb-3" key={indexSize}>
+                                                    {variants.length
+                                                        ? <td rowSpan={variants.length}>{size}</td>
+                                                        : <td>{size}</td>}
+                                                    <td>{variants && variants[0]?.color}</td>
+                                                    <td>
+                                                        <MDBInputGroup textAfter='vnđ'>
+                                                            <input
+                                                                onChange={e => handleChangeVariantInput(e, indexSize, 0, "price")}
+                                                                className='form-control' type='number' step="any"
+                                                                placeholder='Nhập giá' min={0}
+                                                                value={variants && variants[0]?.price}/>
+                                                        </MDBInputGroup>
+                                                    </td>
+                                                    <td>
+                                                        <MDBInputGroup textAfter='cái'>
+                                                            <input
+                                                                onChange={e => handleChangeVariantInput(e, indexSize, 0, "quantity")}
+                                                                className='form-control' type='number'
+                                                                placeholder='Nhập số lượng' min={0}
+                                                                value={variants && variants[0]?.quantity}/>
+                                                        </MDBInputGroup>
+                                                    </td>
+                                                </tr>
+                                                {variants && variants.map(({
+                                                                               color,
+                                                                               price,
+                                                                               quantity
+                                                                           }, indexVariant) => {
+                                                    return <>{indexVariant !== 0 &&
+                                                        <tr className="pb-3" key={indexVariant}>
+                                                            <td>{color}</td>
+                                                            <td>
+                                                                <MDBInputGroup textAfter='vnđ'>
+                                                                    <input
+                                                                        onChange={e => handleChangeVariantInput(e, indexSize, indexVariant, "price")}
+                                                                        value={price} className='form-control' min={0}
+                                                                        type='number' step="any" placeholder='Nhập giá'/>
+                                                                </MDBInputGroup>
+                                                            </td>
+                                                            <td>
+                                                                <MDBInputGroup textAfter='cái'>
+                                                                    <input
+                                                                        onChange={e => handleChangeVariantInput(e, indexSize, indexVariant, "quantity")}
+                                                                        value={quantity} className='form-control' min={0}
+                                                                        type='number' placeholder='Nhập số lượng'/>
+                                                                </MDBInputGroup>
+                                                            </td>
+                                                        </tr>}</>
+                                                })}
+                                            </>
+                                        ))}
+                                    </MDBTableBody>
+                                </MDBTable>
+                            }
+                        </div>
                     </div>
                 </div>
+
 
 
                 {/*<div className="formgrid grid">*/}

@@ -1,4 +1,4 @@
-package com.lantern_business_webapp.payload.request;
+package com.lantern_business_webapp.payload;
 
 import lombok.*;
 
@@ -7,7 +7,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class VariantRequestDTO {
+public class VariantDTO {
     private String id;
     private String size;
     private String color;
