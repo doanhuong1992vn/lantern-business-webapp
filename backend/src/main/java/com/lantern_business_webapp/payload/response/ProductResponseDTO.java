@@ -5,12 +5,13 @@ import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder
 public class ProductResponseDTO {
     protected String id;
     protected String name;
     protected String image;
     protected String category;
+    protected boolean isShow;
 }

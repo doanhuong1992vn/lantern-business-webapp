@@ -11,10 +11,9 @@ import java.util.UUID;
 public class SizeConverterImpl implements SizeConverter {
     @Override
     public SizeDTO convertEntityToResponse(Size size) {
-        if (size == null) {
-            return null;
-        }
-        return SizeDTO.builder()
+        return size == null
+                ? null
+                : SizeDTO.builder()
                 .id(size.getId().toString())
                 .size(size.getName())
                 .build();
@@ -22,9 +21,11 @@ public class SizeConverterImpl implements SizeConverter {
 
     @Override
     public Size convertRequestToEntity(SizeDTO size) {
-        return Size.builder()
+        return size == null
+                ? null
+                : Size.builder()
                 .id(size.getId() == null
-                        ? UUID.randomUUID()
+                        ? null
                         : UUID.fromString(size.getId()))
                 .name(size.getSize())
                 .build();

@@ -19,10 +19,13 @@ public class Variant {
     @Id
     @Type(type="uuid-char")
     private UUID id;
+    @Column(columnDefinition = "DOUBLE NOT NULL CHECK ( PRICE >= 0 )")
+    private Double importPrice;
+    @Column(columnDefinition = "DOUBLE NOT NULL CHECK ( PRICE >= 0 )")
+    private Double salePrice;
+
     @Column(columnDefinition = "INT NOT NULL CHECK ( QUANTITY >= 0 )")
     private Integer quantity;
-    @Column(columnDefinition = "DOUBLE NOT NULL CHECK ( PRICE >= 0 )")
-    private Double price;
     @Column(name = "active")
     private boolean active;
     @Column(name = "is_show")

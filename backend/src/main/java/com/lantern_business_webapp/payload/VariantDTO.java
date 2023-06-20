@@ -11,6 +11,8 @@ public class VariantDTO {
     private String id;
     private String size;
     private String color;
-    private Double price;
+    private Double importPrice;
+    private Double salePrice;
     private Integer quantity;
+    private boolean isShow;
 }

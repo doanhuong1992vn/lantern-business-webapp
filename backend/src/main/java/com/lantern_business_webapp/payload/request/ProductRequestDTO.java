@@ -7,9 +7,9 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.List;
 
-@Builder
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductRequestDTO {
@@ -20,5 +20,6 @@ public class ProductRequestDTO {
     private String image;
     private String description;
     private String category;
+    private boolean isShow;
     private List<VariantDTO> variants;
 }

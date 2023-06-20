@@ -11,10 +11,9 @@ import java.util.UUID;
 public class ColorConverterImpl implements ColorConverter {
     @Override
     public ColorDTO convertEntityToResponse(Color color) {
-        if (color == null) {
-            return null;
-        }
-        return ColorDTO.builder()
+        return color == null
+                ? null
+                : ColorDTO.builder()
                 .id(color.getId().toString())
                 .color(color.getName())
                 .build();
@@ -22,9 +21,11 @@ public class ColorConverterImpl implements ColorConverter {
 
     @Override
     public Color convertRequestToEntity(ColorDTO color) {
-        return Color.builder()
+        return color == null
+                ? null
+                : Color.builder()
                 .id(color.getId() == null
-                        ? UUID.randomUUID()
+                        ? null
                         : UUID.fromString(color.getId()))
                 .name(color.getColor())
                 .build();

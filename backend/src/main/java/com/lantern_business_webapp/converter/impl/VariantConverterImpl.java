@@ -18,27 +18,34 @@ public class VariantConverterImpl implements VariantConverter {
 
     @Override
     public VariantDTO convertEntityToResponse(Variant variant) {
-        return VariantDTO.builder()
+        return variant == null
+                ? null
+                : VariantDTO.builder()
                 .id(variant.getId().toString())
-                .color(variant.getColor().getName())
                 .size(variant.getSize().getName())
+                .color(variant.getColor().getName())
+                .importPrice(variant.getImportPrice())
+                .salePrice(variant.getSalePrice())
                 .quantity(variant.getQuantity())
-                .price(variant.getPrice())
+                .isShow(variant.isShow())
                 .build();
     }
 
     @Override
     public Variant convertRequestToEntity(VariantDTO variantDTO) {
-        return Variant.builder()
+        return variantDTO == null
+                ? null
+                : Variant.builder()
                 .id(variantDTO.getId() == null
-                        ? UUID.randomUUID()
+                        ? null
                         : UUID.fromString(variantDTO.getId()))
-                .size(sizeRepository.findByNameAndActiveTrue(variantDTO.getSize()))
                 .color(colorRepository.findByNameAndActiveTrue(variantDTO.getColor()))
-                .price(variantDTO.getPrice())
+                .size(sizeRepository.findByNameAndActiveTrue(variantDTO.getSize()))
+                .importPrice(variantDTO.getImportPrice())
+                .salePrice(variantDTO.getSalePrice())
                 .quantity(variantDTO.getQuantity())
+                .isShow(variantDTO.isShow())
                 .active(true)
-                .isShow(true)
                 .build();
     }
 }

@@ -9,10 +9,10 @@ import org.springframework.lang.Nullable;
 
 import java.util.Set;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class LoginResponseDTO {
     private String message;
     private String name;

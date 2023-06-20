@@ -11,9 +11,9 @@ import java.util.List;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder
 public class DetailProductResponseDTO extends ProductResponseDTO {
     private String description;
     private List<VariantDTO> variants;

@@ -20,7 +20,7 @@ import AuthContext from "~/security/AuthContext";
 import * as sizeService from "~/services/sizeService";
 import * as colorService from "~/services/colorService";
 import {Checkbox} from "primereact/checkbox";
-import {MDBInputGroup, MDBTable, MDBTableBody, MDBTableHead} from "mdb-react-ui-kit";
+import {MDBBtn, MDBInputGroup, MDBTable, MDBTableBody, MDBTableHead} from "mdb-react-ui-kit";
 import {Editor} from "primereact/editor";
 
 const Products = () => {
@@ -32,21 +32,21 @@ const Products = () => {
         variants: []
     };
     const [file, setFile] = useState('');
-    const [productList, setProductList] = useState([]);
-    const [categories, setCategories] = useState([]);
     const [sizes, setSizes] = useState([]);
-    const [checkedSizes, setCheckedSizes] = useState([]);
     const [colors, setColors] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [productList, setProductList] = useState([]);
+    const [checkedSizes, setCheckedSizes] = useState([]);
     const [checkedColors, setCheckedColors] = useState(() => []);
+    const [product, setProduct] = useState(() => newProduct);
+    const [submitted, setSubmitted] = useState(false);
     const [productDialog, setProductDialog] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState(false);
     const [deleteProductDialog, setDeleteProductDialog] = useState(false);
     const [deleteProductListDialog, setDeleteProductListDialog] = useState(false);
-    const [product, setProduct] = useState(() => newProduct);
-    const [selectedProductList, setSelectedProductList] = useState(null);
-    const [submitted, setSubmitted] = useState(false);
     const [globalFilter, setGlobalFilter] = useState(null);
+    const [selectedProductList, setSelectedProductList] = useState(null);
     const [errorByName, setErrorByName] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState(false);
 
 
     const toast = useRef(null);
@@ -119,11 +119,37 @@ const Products = () => {
         setProductDialog(false);
     };
 
-    const handleOnChangeImage = (event) => {
+    const handleChangeImage = (event) => {
         setFile(event.target.files[0]);
     }
 
-    const handleOnChangeRadioCategory = (e) => {
+    const handleChangeProductInput = (e, name) => {
+        const val = (e.target && e.target.value) || '';
+        let _product = {...product};
+        _product[`${name}`] = val;
+        setProduct(_product);
+    };
+
+    const handleBlurInputName = (e) => {
+        setErrorByName('');
+        const nameIsValid = productList
+            ? productList.some((item) => (item.name === e.target.value) && (item.id !== product.id))
+            : false;
+        if (nameIsValid) {
+            setErrorByName("* Tên sản phẩm đã tồn tại");
+        }
+        if (e.target.value === '') {
+            setErrorByName("* Tên sản phẩm không được để trống");
+        }
+    }
+
+    const handleChangeEditor = (htmlValue) => {
+        let _product = {...product};
+        _product.description = htmlValue;
+        setProduct(_product);
+    }
+
+    const handleChangeRadioCategory = (e) => {
         setSelectedCategory(true);
         let _product = {...product};
         _product['category'] = e.value.category;
@@ -154,58 +180,41 @@ const Products = () => {
             checkedColors.push({...variant});
             setCheckedColors(checkedColors);
             setCheckedSizes(checkedSizes.map((item) => {
-                item.variants = checkedColors.map(item => ({...item}))
+                item.variants.push({...variant})
                 return item;
             }));
         } else {
-            const newCheckedColors = checkedColors.filter((item) => item.color !== e.target.value);
-            setCheckedColors(newCheckedColors);
+            setCheckedColors(checkedColors.filter(({color}) => color !== e.target.value));
             setCheckedSizes(checkedSizes.map((item) => {
-                item.variants = newCheckedColors.map(item => ({...item}))
+                item.variants = item.variants.filter(({color}) => color !== e.target.value);
                 return item;
             }));
         }
     }
 
     const handleChangeVariantInput = (e, indexSize, indexVariant, field) => {
-        setCheckedSizes(checkedSizes.map((sizeItem, rowIndex) => {
-            if (rowIndex === indexSize) {
-                sizeItem.variants?.map((variantItem, columnIndex) => {
-                    if (columnIndex === indexVariant) {
-                        variantItem[field] = e.target.value;
+        setCheckedSizes(checkedSizes.map((item, indexColumn) => {
+            if (indexColumn === indexSize) {
+                item.variants?.map((variant, indexRow) => {
+                    if (indexRow === indexVariant) {
+                        variant[field] = e.target.value;
                     }
-                    return variantItem;
+                    return variant;
                 })
             }
-            return sizeItem;
+            return item;
         }));
         console.log(checkedSizes)
     }
 
-    const handleChangeProductInput = (e, name) => {
-        const val = (e.target && e.target.value) || '';
-        let _product = {...product};
-        _product[`${name}`] = val;
-        setProduct(_product);
-    };
-
-    const handleOnChangeEditor = (htmlValue) => {
-        let _product = {...product};
-        _product.description = htmlValue;
-        setProduct(_product);
-    }
-
-    const handleOnBlurInputName = (e) => {
-        setErrorByName('');
-        const nameIsValid = productList
-            ? productList.some((item) => (item.name === e.target.value) && (item.id !== product.id))
-            : false;
-        if (nameIsValid) {
-            setErrorByName("* Tên sản phẩm đã tồn tại");
-        }
-        if (e.target.value === '') {
-            setErrorByName("* Tên sản phẩm không được để trống");
-        }
+    const handleDeleteVariant = (indexSize, indexVariant) => {
+        setCheckedSizes(checkedSizes.map((item, indexColumn) => {
+            if (indexColumn === indexSize) {
+                item.variants = item.variants.filter((item, indexRow) => indexRow !== indexVariant);
+            }
+            console.log(item)
+            return item;
+        }));
     }
 
     const handleSaveProduct = () => {
@@ -261,8 +270,6 @@ const Products = () => {
             setCheckedColors([]);
             setProduct(newProduct);
             setFile(null);
-        } else {
-
         }
     };
 
@@ -321,7 +328,7 @@ const Products = () => {
         toast.current.show({severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000});
     };
 
-    const handleOnChangeProductsSelected = (e) => {
+    const handleChangeProductsSelected = (e) => {
         setSelectedProductList(e.value);
     }
 
@@ -412,7 +419,7 @@ const Products = () => {
                 <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
                 <DataTable ref={dt} value={productList} selection={selectedProductList}
-                           onSelectionChange={handleOnChangeProductsSelected}
+                           onSelectionChange={handleChangeProductsSelected}
                            dataKey="id" paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
@@ -434,7 +441,7 @@ const Products = () => {
                             {product.image ? "Choose other image" : "Choose image"}
                         </label>
                         <div className="input-group mb-3">
-                            <input type="file" onChange={handleOnChangeImage} accept="/image/*" className="form-control"
+                            <input type="file" onChange={handleChangeImage} accept="/image/*" className="form-control"
                                    id="inputGroupFile02"/>
                         </div>
                         {
@@ -451,7 +458,7 @@ const Products = () => {
                         </label>
                         <InputText id="name" value={product.name} onChange={(e) => handleChangeProductInput(e, 'name')}
                                    className={classNames({'p-invalid': submitted && !product.name})} required
-                                   onBlur={handleOnBlurInputName} maxLength={50}
+                                   onBlur={handleBlurInputName} maxLength={50}
                                    title={"Tên sản phẩm không được vượt quá 50 ký tự"}
                         />
                         <small className="p-error">{
@@ -464,7 +471,7 @@ const Products = () => {
                             Description
                         </label>
                         <Editor value={product.description}
-                                onTextChange={(e) => handleOnChangeEditor(e.htmlValue)}
+                                onTextChange={(e) => handleChangeEditor(e.htmlValue)}
                                 style={{height: '50vh'}}/>
                     </div>
 
@@ -482,7 +489,7 @@ const Products = () => {
                             {categories.map((category) => (
                                 <div className="field-radiobutton col-6 mt-3" key={category.id}>
                                     <RadioButton inputId={category.id} name="category" value={category}
-                                                 onChange={handleOnChangeRadioCategory}
+                                                 onChange={handleChangeRadioCategory}
                                                  checked={product.category === category.category}
                                                  required={true}
                                     />
@@ -527,7 +534,7 @@ const Products = () => {
 
                     <div className="field">
                         <div className="formgrid grid">
-                            {checkedSizes.length !== 0 &&
+                            {checkedSizes.length !== 0 && checkedColors.length !== 0 &&
                                 <MDBTable align="middle">
                                     <MDBTableHead align="middle">
                                         <tr>
@@ -535,10 +542,11 @@ const Products = () => {
                                             <th scope="col">Color</th>
                                             <th scope="col">Price</th>
                                             <th scope="col">Quantity</th>
+                                            <th scope="col"></th>
                                         </tr>
                                     </MDBTableHead>
                                     <MDBTableBody align="middle">
-                                        {checkedSizes && checkedSizes.map(({id, size, variants}, indexSize) => (
+                                        {checkedSizes && checkedSizes.map(({size, variants}, indexSize) => (
                                             <>
                                                 <tr className="pb-3" key={indexSize}>
                                                     {variants.length
@@ -546,22 +554,34 @@ const Products = () => {
                                                         : <td>{size}</td>}
                                                     <td>{variants && variants[0]?.color}</td>
                                                     <td>
+                                                        {variants && variants.length !== 0 &&
                                                         <MDBInputGroup textAfter='vnđ'>
                                                             <input
                                                                 onChange={e => handleChangeVariantInput(e, indexSize, 0, "price")}
-                                                                className='form-control' type='number' step="any"
-                                                                placeholder='Nhập giá' min={0}
+                                                                className='form-control'
+                                                                type='number'
+                                                                step="any"
+                                                                placeholder='Nhập giá'
+                                                                min={0}
                                                                 value={variants && variants[0]?.price}/>
-                                                        </MDBInputGroup>
+                                                        </MDBInputGroup>}
                                                     </td>
                                                     <td>
+                                                        {variants && variants.length !== 0 &&
                                                         <MDBInputGroup textAfter='cái'>
                                                             <input
                                                                 onChange={e => handleChangeVariantInput(e, indexSize, 0, "quantity")}
-                                                                className='form-control' type='number'
-                                                                placeholder='Nhập số lượng' min={0}
+                                                                className='form-control'
+                                                                type='number'
+                                                                placeholder='Nhập số lượng'
+                                                                min={0}
                                                                 value={variants && variants[0]?.quantity}/>
-                                                        </MDBInputGroup>
+                                                        </MDBInputGroup>}
+                                                    </td>
+                                                    <td>
+                                                        {variants && variants.length !== 0 &&
+                                                        <MDBBtn className="btn-close" color="none" aria-label="Close"
+                                                                onClick={e => handleDeleteVariant(indexSize, 0)}/>}
                                                     </td>
                                                 </tr>
                                                 {variants && variants.map(({
@@ -577,16 +597,23 @@ const Products = () => {
                                                                     <input
                                                                         onChange={e => handleChangeVariantInput(e, indexSize, indexVariant, "price")}
                                                                         value={price} className='form-control' min={0}
-                                                                        type='number' step="any" placeholder='Nhập giá'/>
+                                                                        type='number' step="any"
+                                                                        placeholder='Nhập giá'/>
                                                                 </MDBInputGroup>
                                                             </td>
                                                             <td>
                                                                 <MDBInputGroup textAfter='cái'>
                                                                     <input
                                                                         onChange={e => handleChangeVariantInput(e, indexSize, indexVariant, "quantity")}
-                                                                        value={quantity} className='form-control' min={0}
+                                                                        value={quantity} className='form-control'
+                                                                        min={0}
                                                                         type='number' placeholder='Nhập số lượng'/>
                                                                 </MDBInputGroup>
+                                                            </td>
+                                                            <td>
+                                                                <MDBBtn className="btn-close" color="none"
+                                                                        aria-label="Close"
+                                                                        onClick={e => handleDeleteVariant(indexSize, indexVariant)}/>
                                                             </td>
                                                         </tr>}</>
                                                 })}
@@ -598,7 +625,6 @@ const Products = () => {
                         </div>
                     </div>
                 </div>
-
 
 
                 {/*<div className="formgrid grid">*/}

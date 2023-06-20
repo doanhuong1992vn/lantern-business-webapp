@@ -11,10 +11,9 @@ import java.util.UUID;
 public class CategoryConverterImpl implements CategoryConverter {
     @Override
     public CategoryDTO convertEntityToResponse(Category category) {
-        if (category == null) {
-            return null;
-        }
-        return CategoryDTO.builder()
+        return category == null
+                ? null
+                : CategoryDTO.builder()
                 .id(category.getId().toString())
                 .category(category.getName())
                 .build();
@@ -22,9 +21,11 @@ public class CategoryConverterImpl implements CategoryConverter {
 
     @Override
     public Category convertRequestToEntity(CategoryDTO category) {
-        return Category.builder()
+        return category == null
+                ? null
+                : Category.builder()
                 .id(category.getId() == null
-                        ? UUID.randomUUID()
+                        ? null
                         : UUID.fromString(category.getId()))
                 .name(category.getCategory())
                 .build();

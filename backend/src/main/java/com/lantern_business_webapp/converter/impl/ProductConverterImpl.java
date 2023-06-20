@@ -20,45 +20,45 @@ public class ProductConverterImpl implements ProductConverter {
 
     @Override
     public DetailProductResponseDTO convertEntityToDetailResponse(Product product) {
-        if (product == null) {
-            return null;
-        }
-        return DetailProductResponseDTO.builder()
+        return product == null
+                ? null
+                : DetailProductResponseDTO.builder()
                 .id(product.getId().toString())
                 .name(product.getName())
                 .image(product.getImage())
                 .category(product.getCategory().getName())
                 .description(product.getDescription())
+                .isShow(product.isShow())
                 .variants(product.getVariants()
-                        .stream().map(variantConverter::convertEntityToResponse)
+                        .stream()
+                        .map(variantConverter::convertEntityToResponse)
                         .toList())
                 .build();
     }
 
     @Override
     public ProductResponseDTO convertEntityToResponse(Product product) {
-        if (product == null) {
-            return null;
-        }
-        return ProductResponseDTO.builder()
+        return product == null
+                ? null
+                : ProductResponseDTO.builder()
                 .id(product.getId().toString())
                 .name(product.getName())
                 .image(product.getImage())
+                .isShow(product.isShow())
                 .category(product.getCategory().getName())
                 .build();
     }
 
     @Override
     public Product convertRequestToEntity(ProductRequestDTO productRequestDTO) {
-        if (productRequestDTO == null) {
-            return null;
-        }
-        return Product.builder()
+        return productRequestDTO == null
+                ? null
+                : Product.builder()
                 .id(productRequestDTO.getId() == null
-                        ? UUID.randomUUID()
+                        ? null
                         : UUID.fromString(productRequestDTO.getId()))
                 .active(true)
-                .isShow(true)
+                .isShow(productRequestDTO.isShow())
                 .name(productRequestDTO.getName())
                 .image(productRequestDTO.getImage())
                 .description(productRequestDTO.getDescription())
