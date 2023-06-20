@@ -22,11 +22,4 @@ public class Role {
     private String name;
     @Column(name = "description", length = 100, nullable = false)
     private String description;
-
-    @PrePersist
-    public void prePersist() {
-        if (this.id == null) {
-            this.id = UUID.randomUUID();
-        }
-    }
 }

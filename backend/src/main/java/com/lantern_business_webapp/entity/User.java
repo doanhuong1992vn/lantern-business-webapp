@@ -39,12 +39,5 @@ public class User {
     private Set<Role> roles = new HashSet<>();
     @Column(name = "remember_token")
     private String rememberToken;
-
-    @PrePersist
-    public void prePersist() {
-        if (this.id == null) {
-            this.id = UUID.randomUUID();
-        }
-    }
 }
 

@@ -29,12 +29,11 @@ public class Category {
     public Category(String name) {
         this.name = name;
     }
-
-    @PrePersist
-    public void prePersist() {
-        if (this.id == null) {
-            this.id = UUID.randomUUID();
-        }
-    }
-
+//
+//    @PrePersist
+//    public void prePersist() {
+//        if (this.id == null) {
+//            this.id = UUID.randomUUID();
+//        }
+//    }
 }

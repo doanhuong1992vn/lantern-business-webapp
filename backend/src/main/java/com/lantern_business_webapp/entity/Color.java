@@ -24,11 +24,4 @@ public class Color {
     private boolean active;
     @OneToMany(mappedBy = "color", cascade = CascadeType.ALL)
     private Collection<Variant> variants;
-
-    @PrePersist
-    public void prePersist() {
-        if (this.id == null) {
-            this.id = UUID.randomUUID();
-        }
-    }
 }

@@ -19,11 +19,10 @@ public class Variant {
     @Id
     @Type(type="uuid-char")
     private UUID id;
-    @Column(columnDefinition = "DOUBLE NOT NULL CHECK ( PRICE >= 0 )")
+    @Column(name = "import_price", columnDefinition = "DOUBLE NOT NULL CHECK ( IMPORT_PRICE >= 0 )")
     private Double importPrice;
-    @Column(columnDefinition = "DOUBLE NOT NULL CHECK ( PRICE >= 0 )")
+    @Column(name = "sale_price", columnDefinition = "DOUBLE NOT NULL CHECK ( SALE_PRICE >= 0 )")
     private Double salePrice;
-
     @Column(columnDefinition = "INT NOT NULL CHECK ( QUANTITY >= 0 )")
     private Integer quantity;
     @Column(name = "active")
@@ -39,11 +38,4 @@ public class Variant {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "color_id", referencedColumnName = "id")
     private Color color;
-
-    @PrePersist
-    public void prePersist() {
-        if (this.id == null) {
-            this.id = UUID.randomUUID();
-        }
-    }
 }

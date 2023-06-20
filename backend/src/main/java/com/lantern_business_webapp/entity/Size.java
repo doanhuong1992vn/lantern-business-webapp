@@ -25,11 +25,4 @@ public class Size {
     private boolean active;
     @OneToMany(mappedBy = "size", cascade = CascadeType.ALL)
     private Collection<Variant> variants;
-
-    @PrePersist
-    public void prePersist() {
-        if (this.id == null) {
-            this.id = UUID.randomUUID();
-        }
-    }
 }
