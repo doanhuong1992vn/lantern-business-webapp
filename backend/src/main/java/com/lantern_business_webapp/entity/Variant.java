@@ -2,6 +2,7 @@ package com.lantern_business_webapp.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -18,6 +19,8 @@ import java.util.UUID;
 public class Variant {
     @Id
     @Type(type="uuid-char")
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private UUID id;
     @Column(name = "import_price", columnDefinition = "DOUBLE NOT NULL CHECK ( IMPORT_PRICE >= 0 )")
     private Double importPrice;
@@ -38,4 +41,9 @@ public class Variant {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "color_id", referencedColumnName = "id")
     private Color color;
+
+    @Override
+    public String toString() {
+        return super.toString();
+    }
 }

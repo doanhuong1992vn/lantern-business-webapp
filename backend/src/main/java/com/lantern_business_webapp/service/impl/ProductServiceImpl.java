@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
@@ -32,17 +34,28 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponseDTO save(ProductRequestDTO productRequestDTO) {
         Product product = productConverter.convertRequestToEntity(productRequestDTO);
-        Product originProduct = productRepository.save(product);
-        if (productRequestDTO.getVariants() != null) {
-            List<Variant> variants = productRequestDTO.getVariants().stream().map(item -> {
-                Variant variant = variantConverter.convertRequestToEntity(item);
-                variant.setProduct(originProduct);
-                return variant;
-            }).toList();
-            variantRepository.saveAll(variants);
+        Optional<Product> originProduct = productRepository.findById(product.getId());
+        List<Variant> variants = productRequestDTO.getVariants().stream().map(item -> {
+            Variant variant = variantConverter.convertRequestToEntity(item);
+            variant.setProduct(originProduct.orElse(null));
+            return variant;
+        }).toList();
+
+        if (variants.size() < originProduct.get().getVariants().size()) {
+            variants.forEach(variantInput -> {
+                originProduct.get().getVariants().forEach(variantDtb -> {
+                    variantDtb.setActive(false);
+                    if (variantDtb.getSize() == variantInput.getSize()
+                            && variantDtb.getColor() == variantInput.getColor()) {
+                        variantDtb = variantInput;
+                    }
+                });
+            });
+            variantRepository.saveAll(originProduct.get().getVariants());
         }
-        return productConverter.convertEntityToResponse(originProduct);
-    }
+        return null;
+//        return productConverter.convertEntityToResponse(originProduct);
+}
 
     @Override
     public void delete(String id) {

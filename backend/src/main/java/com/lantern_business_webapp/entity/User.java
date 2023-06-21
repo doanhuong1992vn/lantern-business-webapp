@@ -1,8 +1,10 @@
 package com.lantern_business_webapp.entity;
 
 import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -18,6 +20,9 @@ import java.util.UUID;
 @Table(uniqueConstraints = {@UniqueConstraint(name = "user_uk", columnNames = {"email", "phone", "username"})})
 public class User {
     @Id
+    @Type(type="uuid-char")
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private UUID id;
     @Column(name = "fullname", length = 50, nullable = false)
     private String fullName;
@@ -39,5 +44,10 @@ public class User {
     private Set<Role> roles = new HashSet<>();
     @Column(name = "remember_token")
     private String rememberToken;
+
+    @Override
+    public String toString() {
+        return super.toString();
+    }
 }
 
