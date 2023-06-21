@@ -14,4 +14,10 @@ public class ProductResponseDTO {
     protected String image;
     protected String category;
     protected boolean isShow;
+
+    @Override
+    public String toString() {
+        return String.format("id = %s, name = %s, image = %s, category = %s, isShow = %b",
+                getId(), getName(), getImage(), getCategory(), isShow());
+    }
 }

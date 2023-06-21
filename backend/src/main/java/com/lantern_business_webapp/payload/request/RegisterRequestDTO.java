@@ -29,4 +29,10 @@ public class RegisterRequestDTO {
     private String phone;
     @NotBlank
     private String password;
+
+    @Override
+    public String toString() {
+        return String.format("fullName = %s, username = %s, email = %s, phone = %s, password = %s",
+                getFullName(), getUsername(), getEmail(), getPhone(), getPassword());
+    }
 }

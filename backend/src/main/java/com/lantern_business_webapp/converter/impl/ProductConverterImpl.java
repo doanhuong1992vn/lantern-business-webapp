@@ -3,6 +3,7 @@ package com.lantern_business_webapp.converter.impl;
 import com.lantern_business_webapp.converter.ProductConverter;
 import com.lantern_business_webapp.converter.VariantConverter;
 import com.lantern_business_webapp.entity.Product;
+import com.lantern_business_webapp.entity.Variant;
 import com.lantern_business_webapp.payload.request.ProductRequestDTO;
 import com.lantern_business_webapp.payload.response.DetailProductResponseDTO;
 import com.lantern_business_webapp.payload.response.ProductResponseDTO;
@@ -31,6 +32,7 @@ public class ProductConverterImpl implements ProductConverter {
                 .isShow(product.isShow())
                 .variants(product.getVariants()
                         .stream()
+                        .filter(Variant::isActive)
                         .map(variantConverter::convertEntityToResponse)
                         .toList())
                 .build();

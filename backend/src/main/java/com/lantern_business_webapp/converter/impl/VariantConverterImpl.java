@@ -21,7 +21,7 @@ public class VariantConverterImpl implements VariantConverter {
         return variant == null
                 ? null
                 : VariantDTO.builder()
-                .id(variant.getId().toString())
+                .id(variant.getId() == null ? null : variant.getId().toString())
                 .size(variant.getSize().getName())
                 .color(variant.getColor().getName())
                 .importPrice(variant.getImportPrice())

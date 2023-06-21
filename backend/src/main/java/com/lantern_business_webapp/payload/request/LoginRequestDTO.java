@@ -1,8 +1,17 @@
 package com.lantern_business_webapp.payload.request;
 
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.validation.constraints.NotBlank;
 
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class LoginRequestDTO {
 
     @NotBlank
@@ -11,19 +20,8 @@ public class LoginRequestDTO {
     @NotBlank
     private String password;
 
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
+    @Override
+    public String toString() {
+        return String.format("username = %s, password = %s", getUsername(), getPassword());
     }
 }

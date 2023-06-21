@@ -35,7 +35,7 @@ public class User {
     @Column(name = "phone", length = 10, nullable = false)
     private String phone;
     @Column(name = "active")
-    private Boolean active;
+    private boolean active;
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -47,7 +47,8 @@ public class User {
 
     @Override
     public String toString() {
-        return super.toString();
+        return String.format("id = %s, fullName = %s, username = %s, password = %s, email = %s, phone = %s, active = %b",
+                getId().toString(), getFullName(), getUsername(), getPassword(), getEmail(), getPhone(), isActive());
     }
 }
 

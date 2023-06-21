@@ -24,4 +24,9 @@ public class ProductRequestDTO {
     private boolean isShow;
     @NotNull
     private List<VariantDTO> variants;
+
+    @Override
+    public String toString() {
+        return String.format("id = %s, name = %s, image = %s, description = %s, category = %s, isShow = %b, variants = %s", getId(), getName(), getImage(), getDescription(), getCategory(), isShow(), getVariants().toString());
+    }
 }

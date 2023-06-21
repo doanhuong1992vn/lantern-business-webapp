@@ -178,11 +178,13 @@ const Products = () => {
                 quantity: null,
                 importPrice: null,
                 salePrice: null,
+                show: true, //bên backend là isShow, nhưng bên này để show thì bên kia mới nhận được giá trị @@ wtf ???
             }
             checkedColors.push({...variant});
             setCheckedColors(checkedColors);
             setCheckedSizes(checkedSizes.map((item) => {
                 item.variants.push({...variant, size: item.size})
+                console.log(item.variants)
                 return item;
             }));
         } else {
@@ -199,7 +201,7 @@ const Products = () => {
             if (indexColumn === indexSize) {
                 item.variants?.map((variant, indexRow) => {
                     if (indexRow === indexVariant) {
-                        variant[field] = e.value;
+                        variant[field] = e.value; //vì sử dụng thẻ InputNumber của PrimeReact nên e.value tương đương e.target.value
                     }
                     return variant;
                 })
@@ -238,7 +240,8 @@ const Products = () => {
             let _productList = [...productList];
             let _product = {...product};
             const variants = [];
-            checkedSizes.forEach(item => {item.variants.forEach(variant => variants.push(variant))});
+            checkedSizes.forEach(item => {item.variants.forEach(variant => variants.push({...variant, size: item.size}))});
+            console.log(variants)
             _product.variants = variants;
             _product.description = description;
             if (file) {
@@ -286,7 +289,7 @@ const Products = () => {
                     severity: 'success',
                     summary: 'Successful',
                     detail: 'Product Created',
-                    life: 3000
+                    life: 5000
                 });
             })
             .catch((error) => console.log(error));
@@ -298,7 +301,7 @@ const Products = () => {
                 setProduct(response.data)
                 const index = findIndexById(product.id);
                 _productList[index] = response.data;
-                toast.current.show({severity: 'success', summary: 'Successful', detail: 'Product Updated', life: 3000});
+                toast.current.show({severity: 'success', summary: 'Successful', detail: 'Product Updated', life: 5000});
             })
             .catch((error) => console.log(error));
     }
@@ -329,7 +332,7 @@ const Products = () => {
         setProductList(_products);
         setDeleteProductDialog(false);
         setProduct(newProduct);
-        toast.current.show({severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000});
+        toast.current.show({severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 5000});
     };
 
     const handleChangeProductsSelected = (e) => {
@@ -353,7 +356,7 @@ const Products = () => {
         setProductList(_products);
         setDeleteProductListDialog(false);
         setSelectedProductList(null);
-        toast.current.show({severity: 'success', summary: 'Successful', detail: 'Products Deleted', life: 3000});
+        toast.current.show({severity: 'success', summary: 'Successful', detail: 'Products Deleted', life: 5000});
     };
 
     const leftToolbarTemplate = () => {

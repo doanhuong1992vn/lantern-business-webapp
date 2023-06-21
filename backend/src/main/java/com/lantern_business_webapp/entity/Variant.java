@@ -6,6 +6,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -44,6 +45,24 @@ public class Variant {
 
     @Override
     public String toString() {
-        return super.toString();
+        return String.format("id = %s, importPrice = %f, salePrice = %f, quantity = %d, active = %b, isShow = %b",
+                getId().toString(), getImportPrice(), getSalePrice(), getQuantity(), isActive(), isShow());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Variant variant = (Variant) obj;
+        return Objects.equals(id == null ? null : id.toString(), variant.id == null ? null : variant.id.toString())
+                && Objects.equals(importPrice, variant.getImportPrice())
+                && Objects.equals(salePrice, variant.getSalePrice())
+                && Objects.equals(quantity, variant.getQuantity())
+                && Objects.equals(size.getName(), variant.getSize().getName())
+                && Objects.equals(color.getName(), variant.getColor().getName());
     }
 }

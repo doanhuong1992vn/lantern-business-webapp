@@ -16,10 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,28 +31,32 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponseDTO save(ProductRequestDTO productRequestDTO) {
         Product product = productConverter.convertRequestToEntity(productRequestDTO);
-        Optional<Product> originProduct = productRepository.findById(product.getId());
-        List<Variant> variants = productRequestDTO.getVariants().stream().map(item -> {
-            Variant variant = variantConverter.convertRequestToEntity(item);
-            variant.setProduct(originProduct.orElse(null));
-            return variant;
-        }).toList();
-
-        if (variants.size() < originProduct.get().getVariants().size()) {
-            variants.forEach(variantInput -> {
-                originProduct.get().getVariants().forEach(variantDtb -> {
-                    variantDtb.setActive(false);
-                    if (variantDtb.getSize() == variantInput.getSize()
-                            && variantDtb.getColor() == variantInput.getColor()) {
-                        variantDtb = variantInput;
+        Product productDatabase = productRepository.save(product);
+        List<Variant> variantInputs = new ArrayList<>(productRequestDTO.getVariants().stream().map(item -> {
+            Variant variantInput = variantConverter.convertRequestToEntity(item);
+            variantInput.setProduct(productDatabase);
+            return variantInput;
+        }).toList());
+        List<Variant> variantsDatabase = variantRepository.findByProduct(productDatabase);
+        if (variantsDatabase.isEmpty()) {
+            variantRepository.saveAll(variantInputs);
+        } else {
+            variantInputs.forEach(variantInput -> {
+                variantsDatabase.forEach(variantDatabase -> {
+                    if (Objects.equals(variantDatabase.getSize().getName(), variantInput.getSize().getName())
+                            && Objects.equals(variantDatabase.getColor().getName(), variantInput.getColor().getName())) {
+                        variantInput.setId(variantDatabase.getId());
                     }
                 });
             });
-            variantRepository.saveAll(originProduct.get().getVariants());
+            variantsDatabase.removeAll(variantInputs);
+            List<Variant> variantsToRemove = new ArrayList<>(variantsDatabase);
+            variantsToRemove.forEach(variant -> variant.setActive(false));
+            variantInputs.addAll(variantsToRemove);
+            variantRepository.saveAll(variantInputs);
         }
-        return null;
-//        return productConverter.convertEntityToResponse(originProduct);
-}
+        return productConverter.convertEntityToResponse(productDatabase);
+    }
 
     @Override
     public void delete(String id) {

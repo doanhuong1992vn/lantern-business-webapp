@@ -27,6 +27,7 @@ public class Role {
 
     @Override
     public String toString() {
-        return super.toString();
+        return String.format("id = %s, name = %s, description = %s",
+                getId().toString(), getName(), getDescription());
     }
 }

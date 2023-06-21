@@ -40,6 +40,7 @@ public class Product {
 
     @Override
     public String toString() {
-        return super.toString();
+        return String.format("id = %s, name = %s, description = %s, image = %s, active = %b, isShow = %b",
+                getId().toString(), getName(), getDescription(), getImage(), isActive(), isShow());
     }
 }
