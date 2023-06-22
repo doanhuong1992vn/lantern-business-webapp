@@ -30,8 +30,8 @@ public class Product {
     private String image;
     @Column(name = "active")
     private boolean active;
-    @Column(name = "is_show")
-    private boolean isShow;
+    @Column(name = "is_shown")
+    private boolean isShown;
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private Collection<Variant> variants;
     @ManyToOne(fetch = FetchType.EAGER)
@@ -40,7 +40,7 @@ public class Product {
 
     @Override
     public String toString() {
-        return String.format("id = %s, name = %s, description = %s, image = %s, active = %b, isShow = %b",
-                getId().toString(), getName(), getDescription(), getImage(), isActive(), isShow());
+        return String.format("id = %s, name = %s, description = %s, image = %s, active = %b, isShown = %b",
+                getId().toString(), getName(), getDescription(), getImage(), isActive(), isShown());
     }
 }

@@ -11,6 +11,7 @@ import com.lantern_business_webapp.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 @Component
@@ -20,16 +21,14 @@ public class ProductConverterImpl implements ProductConverter {
     private final VariantConverter variantConverter;
 
     @Override
-    public DetailProductResponseDTO convertEntityToDetailResponse(Product product) {
-        return product == null
-                ? null
-                : DetailProductResponseDTO.builder()
+    public DetailProductResponseDTO convertEntityToDetailResponse(@NotNull Product product) {
+        return DetailProductResponseDTO.builder()
                 .id(product.getId().toString())
                 .name(product.getName())
                 .image(product.getImage())
                 .category(product.getCategory().getName())
                 .description(product.getDescription())
-                .isShow(product.isShow())
+                .isShown(product.isShown())
                 .variants(product.getVariants()
                         .stream()
                         .filter(Variant::isActive)
@@ -39,28 +38,24 @@ public class ProductConverterImpl implements ProductConverter {
     }
 
     @Override
-    public ProductResponseDTO convertEntityToResponse(Product product) {
-        return product == null
-                ? null
-                : ProductResponseDTO.builder()
+    public ProductResponseDTO convertEntityToResponse(@NotNull Product product) {
+        return ProductResponseDTO.builder()
                 .id(product.getId().toString())
                 .name(product.getName())
                 .image(product.getImage())
-                .isShow(product.isShow())
+                .isShown(product.isShown())
                 .category(product.getCategory().getName())
                 .build();
     }
 
     @Override
-    public Product convertRequestToEntity(ProductRequestDTO productRequestDTO) {
-        return productRequestDTO == null
-                ? null
-                : Product.builder()
+    public Product convertRequestToEntity(@NotNull ProductRequestDTO productRequestDTO) {
+        return Product.builder()
                 .id(productRequestDTO.getId() == null
                         ? null
                         : UUID.fromString(productRequestDTO.getId()))
                 .active(true)
-                .isShow(productRequestDTO.isShow())
+                .isShown(productRequestDTO.isShown())
                 .name(productRequestDTO.getName())
                 .image(productRequestDTO.getImage())
                 .description(productRequestDTO.getDescription())

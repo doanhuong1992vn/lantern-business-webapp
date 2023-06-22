@@ -2,19 +2,32 @@ package com.lantern_business_webapp.payload;
 
 import lombok.*;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
+
 @Builder
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class VariantDTO {
+    @NotBlank
     private String id;
+    @NotBlank
     private String size;
+    @NotBlank
     private String color;
+    @NotNull
+    @PositiveOrZero
     private Double importPrice;
+    @NotNull
+    @PositiveOrZero
     private Double salePrice;
+    @NotNull
+    @PositiveOrZero
     private Integer quantity;
-    private boolean isShow;
+    private boolean isShown;
 
     @Override
     public String toString() {
@@ -24,7 +37,7 @@ public class VariantDTO {
                         "quantity = %d, " +
                         "size = %s, " +
                         "color = %s" +
-                        "isShow = %b",
-                getId(), getImportPrice(), getSalePrice(), getQuantity(), getSize(), getColor(), isShow());
+                        "isShown = %b",
+                getId(), getImportPrice(), getSalePrice(), getQuantity(), getSize(), getColor(), isShown());
     }
 }

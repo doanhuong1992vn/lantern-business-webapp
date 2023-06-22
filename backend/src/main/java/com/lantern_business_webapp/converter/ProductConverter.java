@@ -5,7 +5,9 @@ import com.lantern_business_webapp.payload.request.ProductRequestDTO;
 import com.lantern_business_webapp.payload.response.DetailProductResponseDTO;
 import com.lantern_business_webapp.payload.response.ProductResponseDTO;
 
+import javax.validation.constraints.NotNull;
+
 public interface ProductConverter extends GeneralConverter
         <Product, ProductRequestDTO, ProductResponseDTO> {
-    DetailProductResponseDTO convertEntityToDetailResponse(Product product);
+    DetailProductResponseDTO convertEntityToDetailResponse(@NotNull Product product);
 }

@@ -31,8 +31,8 @@ public class Variant {
     private Integer quantity;
     @Column(name = "active")
     private boolean active;
-    @Column(name = "is_show")
-    private boolean isShow;
+    @Column(name = "is_shown")
+    private boolean isShown;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_id", referencedColumnName = "id")
     private Product product;
@@ -45,8 +45,8 @@ public class Variant {
 
     @Override
     public String toString() {
-        return String.format("id = %s, importPrice = %f, salePrice = %f, quantity = %d, active = %b, isShow = %b",
-                getId().toString(), getImportPrice(), getSalePrice(), getQuantity(), isActive(), isShow());
+        return String.format("id = %s, importPrice = %f, salePrice = %f, quantity = %d, active = %b, isShown = %b",
+                getId().toString(), getImportPrice(), getSalePrice(), getQuantity(), isActive(), isShown());
     }
 
     @Override

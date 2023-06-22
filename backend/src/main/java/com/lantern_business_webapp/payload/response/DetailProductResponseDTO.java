@@ -20,6 +20,6 @@ public class DetailProductResponseDTO extends ProductResponseDTO {
 
     @Override
     public String toString() {
-        return String.format("id = %s, name = %s, image = %s, description = %s, category = %s, isShow = %b, variants = %s", getId(), getName(), getImage(), getDescription(), getCategory(), isShow(), getVariants().toString());
+        return String.format("id = %s, name = %s, image = %s, description = %s, category = %s, isShown = %b, variants = %s", getId(), getName(), getImage(), getDescription(), getCategory(), isShown(), getVariants().toString());
     }
 }

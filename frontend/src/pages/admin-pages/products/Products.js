@@ -30,7 +30,7 @@ const Products = () => {
         image: null,
         description: '',
         category: '',
-        isShow: true,
+        shown: true,
         variants: []
     };
     const [file, setFile] = useState('');
@@ -110,6 +110,10 @@ const Products = () => {
                         _checkedSizes.find(item => item.size === variant.size).variants.push(variant);
                     }
                 });
+                _checkedSizes.map(item => {
+                    item.isFullColor = item.variants.length >= _checkedColors.length;
+                    return item;
+                })
                 setCheckedColors(_checkedColors);
                 setCheckedSizes(_checkedSizes);
             })
@@ -162,6 +166,7 @@ const Products = () => {
         if (e.target.checked) {
             const sizeData = {
                 size: e.target.value,
+                isFullColor: true,
                 variants: checkedColors.map(item => ({...item}))
             };
             setCheckedSizes([...checkedSizes, sizeData]);
@@ -178,13 +183,12 @@ const Products = () => {
                 quantity: null,
                 importPrice: null,
                 salePrice: null,
-                show: true, //bên backend là isShow, nhưng bên này để show thì bên kia mới nhận được giá trị @@ wtf ???
+                shown: true, //bên backend là shown, nhưng bên này để shown thì bên kia mới nhận được giá trị @@ đó là do quy tắc JavaBeans ???
             }
             checkedColors.push({...variant});
             setCheckedColors(checkedColors);
             setCheckedSizes(checkedSizes.map((item) => {
                 item.variants.push({...variant, size: item.size})
-                console.log(item.variants)
                 return item;
             }));
         } else {
@@ -226,9 +230,24 @@ const Products = () => {
     const handleDeleteVariant = () => {
         setCheckedSizes(checkedSizes.map(item => {
             item.variants = item.variants.filter(item => item !== variant);
+            item.isFullColor = item.variants.length >= checkedColors.length;
             return item;
         }));
         setDeleteVariantDialog(false);
+    }
+
+    const handleAddVariant = (indexSize) => {
+        setCheckedSizes(checkedSizes.map((item, index) => {
+            if (index === indexSize) {
+                item.variants.push([...checkedColors].filter(variant => {
+                    if (item.variants.every(({color}) => color !== variant.color)) {
+                        return variant;
+                    }
+                }).shift())
+            }
+            item.isFullColor = item.variants.length >= checkedColors.length;
+            return item;
+        }));
     }
 
     const handleSaveProduct = () => {
@@ -240,7 +259,9 @@ const Products = () => {
             let _productList = [...productList];
             let _product = {...product};
             const variants = [];
-            checkedSizes.forEach(item => {item.variants.forEach(variant => variants.push({...variant, size: item.size}))});
+            checkedSizes.forEach(item => {
+                item.variants.forEach(variant => variants.push({...variant, size: item.size}))
+            });
             console.log(variants)
             _product.variants = variants;
             _product.description = description;
@@ -457,11 +478,10 @@ const Products = () => {
             </div>
 
             <Dialog visible={productDialog}
-                    style={{width: '70rem'}}
                     breakpoints={{'960px': '75vw', '641px': '90vw'}}
                     header={product.id ? "Product Detail" : "Create New Product"}
                     modal
-                    className="p-fluid"
+                    className="p-fluid w-75"
                     footer={productDialogFooter}
                     onHide={handleHideProductDialog}
             >
@@ -584,6 +604,7 @@ const Products = () => {
                                     <MDBTableHead align="middle">
                                         <tr>
                                             <th scope="col">Size</th>
+                                            <th scope="col">Add Color</th>
                                             <th scope="col">Color</th>
                                             <th scope="col">Import Price</th>
                                             <th scope="col">Sale Price</th>
@@ -592,12 +613,33 @@ const Products = () => {
                                         </tr>
                                     </MDBTableHead>
                                     <MDBTableBody align="middle">
-                                        {checkedSizes && checkedSizes.map(({size, variants}, indexSize) => (
+                                        {checkedSizes && checkedSizes.map(({
+                                                                               size,
+                                                                               variants,
+                                                                               isFullColor
+                                                                           }, indexSize) => (
                                             <>
                                                 <tr className="pb-3" key={indexSize}>
                                                     {variants.length
-                                                        ? <td rowSpan={variants.length}>{size}</td>
-                                                        : <td>{size}</td>}
+                                                        ? <>
+                                                            <td rowSpan={variants.length}>{size}</td>
+                                                            <td rowSpan={variants.length}>
+                                                                <Button icon="pi pi-plus"
+                                                                        rounded
+                                                                        onClick={() => handleAddVariant(indexSize)}
+                                                                        disabled={isFullColor}
+                                                                />
+                                                            </td>
+                                                        </>
+                                                        : <>
+                                                            <td>{size}</td>
+                                                            <td>
+                                                                <Button icon="pi pi-plus"
+                                                                        rounded
+                                                                        onClick={() => handleAddVariant(indexSize)}
+                                                                />
+                                                            </td>
+                                                        </>}
                                                     <td>{variants && variants[0]?.color}</td>
                                                     <td>
                                                         {variants && variants.length !== 0 &&

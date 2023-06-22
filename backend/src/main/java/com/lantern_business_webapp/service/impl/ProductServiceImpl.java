@@ -16,6 +16,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,7 +31,7 @@ public class ProductServiceImpl implements ProductService {
     private final VariantConverter variantConverter;
 
     @Override
-    public ProductResponseDTO save(ProductRequestDTO productRequestDTO) {
+    public ProductResponseDTO save(@NotNull ProductRequestDTO productRequestDTO) {
         Product product = productConverter.convertRequestToEntity(productRequestDTO);
         Product productDatabase = productRepository.save(product);
         List<Variant> variantInputs = new ArrayList<>(productRequestDTO.getVariants().stream().map(item -> {
@@ -38,9 +40,7 @@ public class ProductServiceImpl implements ProductService {
             return variantInput;
         }).toList());
         List<Variant> variantsDatabase = variantRepository.findByProduct(productDatabase);
-        if (variantsDatabase.isEmpty()) {
-            variantRepository.saveAll(variantInputs);
-        } else {
+        if (!variantsDatabase.isEmpty()) {
             variantInputs.forEach(variantInput -> {
                 variantsDatabase.forEach(variantDatabase -> {
                     if (Objects.equals(variantDatabase.getSize().getName(), variantInput.getSize().getName())
@@ -53,13 +53,13 @@ public class ProductServiceImpl implements ProductService {
             List<Variant> variantsToRemove = new ArrayList<>(variantsDatabase);
             variantsToRemove.forEach(variant -> variant.setActive(false));
             variantInputs.addAll(variantsToRemove);
-            variantRepository.saveAll(variantInputs);
         }
+        variantRepository.saveAll(variantInputs);
         return productConverter.convertEntityToResponse(productDatabase);
     }
 
     @Override
-    public void delete(String id) {
+    public void delete(@NotNull @NotBlank String id) {
         Optional<Product> optionalProduct = productRepository.findById(UUID.fromString(id));
         if (optionalProduct.isPresent()) {
             Product product = optionalProduct.get();
@@ -74,7 +74,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Page<Product> findByCategory(Category category, Pageable pageable) {
+    public Page<Product> findByCategory(@NotNull Category category, Pageable pageable) {
         return productRepository.findAllByCategory(category, pageable);
     }
 
@@ -115,7 +115,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponseDTO findById(String id) {
+    public ProductResponseDTO findById(@NotNull @NotBlank String id) {
         return productRepository
                 .findById(UUID.fromString(id))
                 .map(productConverter::convertEntityToDetailResponse)

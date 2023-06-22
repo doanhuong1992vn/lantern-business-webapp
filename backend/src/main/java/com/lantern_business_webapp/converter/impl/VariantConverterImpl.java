@@ -8,6 +8,7 @@ import com.lantern_business_webapp.repository.SizeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -17,25 +18,21 @@ public class VariantConverterImpl implements VariantConverter {
     private final ColorRepository colorRepository;
 
     @Override
-    public VariantDTO convertEntityToResponse(Variant variant) {
-        return variant == null
-                ? null
-                : VariantDTO.builder()
+    public VariantDTO convertEntityToResponse(@NotNull Variant variant) {
+        return VariantDTO.builder()
                 .id(variant.getId() == null ? null : variant.getId().toString())
                 .size(variant.getSize().getName())
                 .color(variant.getColor().getName())
                 .importPrice(variant.getImportPrice())
                 .salePrice(variant.getSalePrice())
                 .quantity(variant.getQuantity())
-                .isShow(variant.isShow())
+                .isShown(variant.isShown())
                 .build();
     }
 
     @Override
-    public Variant convertRequestToEntity(VariantDTO variantDTO) {
-        return variantDTO == null
-                ? null
-                : Variant.builder()
+    public Variant convertRequestToEntity(@NotNull VariantDTO variantDTO) {
+        return Variant.builder()
                 .id(variantDTO.getId() == null
                         ? null
                         : UUID.fromString(variantDTO.getId()))
@@ -44,7 +41,7 @@ public class VariantConverterImpl implements VariantConverter {
                 .importPrice(variantDTO.getImportPrice())
                 .salePrice(variantDTO.getSalePrice())
                 .quantity(variantDTO.getQuantity())
-                .isShow(variantDTO.isShow())
+                .isShown(variantDTO.isShown())
                 .active(true)
                 .build();
     }

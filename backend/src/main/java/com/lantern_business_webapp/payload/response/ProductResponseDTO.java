@@ -13,11 +13,11 @@ public class ProductResponseDTO {
     protected String name;
     protected String image;
     protected String category;
-    protected boolean isShow;
+    protected boolean isShown;
 
     @Override
     public String toString() {
-        return String.format("id = %s, name = %s, image = %s, category = %s, isShow = %b",
-                getId(), getName(), getImage(), getCategory(), isShow());
+        return String.format("id = %s, name = %s, image = %s, category = %s, isShown = %b",
+                getId(), getName(), getImage(), getCategory(), isShown());
     }
 }

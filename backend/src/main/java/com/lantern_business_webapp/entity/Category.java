@@ -18,13 +18,12 @@ import java.util.UUID;
 @JsonIgnoreProperties(value = "products")
 public class Category {
     @Id
-    @Type(type="uuid-char")
+    @Type(type = "uuid-char")
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private UUID id;
     @Column(nullable = false)
     private String name;
-
     @Column(name = "active")
     private boolean active;
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)

@@ -1,8 +1,10 @@
 package com.lantern_business_webapp.converter;
 
-public interface GeneralConverter<ENTITY, REQUEST_DTO, RESPONSE_DTO> {
-    RESPONSE_DTO convertEntityToResponse(ENTITY source);
+import javax.validation.constraints.NotNull;
 
-    ENTITY convertRequestToEntity(REQUEST_DTO source);
+public interface GeneralConverter<ENTITY, REQUEST_DTO, RESPONSE_DTO> {
+    RESPONSE_DTO convertEntityToResponse(@NotNull ENTITY source);
+
+    ENTITY convertRequestToEntity(@NotNull REQUEST_DTO source);
 
 }
