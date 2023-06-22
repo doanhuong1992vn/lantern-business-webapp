@@ -23,6 +23,7 @@ import {Checkbox} from "primereact/checkbox";
 import {MDBBtn, MDBTable, MDBTableBody, MDBTableHead} from "mdb-react-ui-kit";
 import {Editor} from "primereact/editor";
 import {InputNumber} from "primereact/inputnumber";
+import BootstrapSwitchButton from "bootstrap-switch-button-react";
 
 const Products = () => {
     let newProduct = {
@@ -52,6 +53,7 @@ const Products = () => {
     const [globalFilter, setGlobalFilter] = useState(null);
     const [selectedProductList, setSelectedProductList] = useState(null);
     const [variant, setVariant] = useState({});
+    const [expandedRows, setExpandedRows] = useState([]);
 
 
     const toast = useRef(null);
@@ -450,6 +452,48 @@ const Products = () => {
         </React.Fragment>
     );
 
+    const shownOfProduct = (rowData) => (
+        <BootstrapSwitchButton checked={true} onstyle="light" offstyle="dark"
+                               style="border" onlabel="on" offlabel="off" size="sm" width="70"
+        />
+    );
+
+    const onRowExpand = (event) => {
+        toast.current.show({ severity: 'info', summary: 'Product Expanded', detail: event.data.name, life: 3000 });
+    };
+
+    const onRowCollapse = (event) => {
+        toast.current.show({ severity: 'success', summary: 'Product Collapsed', detail: event.data.name, life: 3000 });
+    };
+
+    const allowExpansion = (rowData) => {
+        return rowData.variants.length > 0;
+    };
+
+    const rowExpansionTemplate = (data) => {
+        return (
+            <div className="p-3">
+                <h5>Variants of {data.name}</h5>
+                <DataTable value={data.variants}>
+                    <Column field="size" header="Kích thước" sortable></Column>
+                    <Column field="color" header="Màu sắc" sortable></Column>
+                    <Column field="importPrice" header="Giá nhập" body={amountBodyTemplate} sortable></Column>
+                    <Column field="importPrice" header="Giá nhập" body={amountBodyTemplate} sortable></Column>
+                    {/*<Column field="status" header="Status" body={statusOrderBodyTemplate} sortable></Column>*/}
+                    {/*<Column headerStyle={{ width: '4rem' }} body={searchBodyTemplate}></Column>*/}
+                </DataTable>
+            </div>
+        );
+    };
+
+    const formatCurrency = (value) => {
+        return value.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+    };
+
+    const amountBodyTemplate = (rowData) => {
+        return formatCurrency(rowData.importPrice);
+    };
+
     return (
         <div className="m-3">
             <Toast ref={toast}/>
@@ -458,8 +502,13 @@ const Products = () => {
 
                 <DataTable ref={dt}
                            value={productList}
-                           selection={selectedProductList}
-                           onSelectionChange={handleChangeProductsSelected}
+                           // selection={selectedProductList}
+                           // onSelectionChange={handleChangeProductsSelected}
+                           expandedRows={expandedRows}
+                           onRowToggle={(e) => setExpandedRows(e.data)}
+                           rowExpansionTemplate={rowExpansionTemplate}
+                           onRowExpand={onRowExpand}
+                           onRowCollapse={onRowCollapse}
                            dataKey="id"
                            paginator
                            rows={10}
@@ -469,10 +518,12 @@ const Products = () => {
                            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
                            globalFilter={globalFilter}
                            header={header}>
-                    <Column selectionMode="multiple" exportable={true}></Column>
-                    <Column field="name" header="Name" sortable style={{minWidth: '16rem'}}></Column>
-                    <Column field="image" header="Image" body={imageBodyTemplate}></Column>
-                    <Column field="category" header="Category" sortable style={{minWidth: '10rem'}}></Column>
+                    {/*<Column selectionMode="multiple" exportable={true}></Column>*/}
+                    <Column expander={allowExpansion} style={{ width: '5rem' }} />
+                    <Column field="name" header="Tên sản phẩm" sortable style={{minWidth: '16rem'}}></Column>
+                    <Column field="image" header="Hình ảnh" body={imageBodyTemplate}></Column>
+                    <Column field="category" header="Danh mục" sortable style={{minWidth: '10rem'}}></Column>
+                    <Column field="shown" header="Hiển thị" body={shownOfProduct} style={{minWidth: '5rem'}}></Column>
                     <Column body={actionBodyTemplate} exportable={false} style={{minWidth: '12rem'}}></Column>
                 </DataTable>
             </div>

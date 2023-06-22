@@ -45,6 +45,11 @@ public class ProductConverterImpl implements ProductConverter {
                 .image(product.getImage())
                 .isShown(product.isShown())
                 .category(product.getCategory().getName())
+                .variants(product.getVariants()
+                        .stream()
+                        .filter(Variant::isActive)
+                        .map(variantConverter::convertEntityToResponse)
+                        .toList())
                 .build();
     }
 
