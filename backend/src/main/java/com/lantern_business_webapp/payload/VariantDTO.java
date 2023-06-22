@@ -36,7 +36,7 @@ public class VariantDTO {
                         "salePrice = %f, " +
                         "quantity = %d, " +
                         "size = %s, " +
-                        "color = %s" +
+                        "color = %s, " +
                         "isShown = %b",
                 getId(), getImportPrice(), getSalePrice(), getQuantity(), getSize(), getColor(), isShown());
     }

@@ -8,6 +8,7 @@ import com.lantern_business_webapp.payload.request.ProductRequestDTO;
 import com.lantern_business_webapp.payload.response.DetailProductResponseDTO;
 import com.lantern_business_webapp.payload.response.ProductResponseDTO;
 import com.lantern_business_webapp.repository.CategoryRepository;
+import com.lantern_business_webapp.repository.VariantRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +19,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ProductConverterImpl implements ProductConverter {
     private final CategoryRepository categoryRepository;
+    private final VariantRepository variantRepository;
     private final VariantConverter variantConverter;
 
     @Override
@@ -29,7 +31,7 @@ public class ProductConverterImpl implements ProductConverter {
                 .category(product.getCategory().getName())
                 .description(product.getDescription())
                 .isShown(product.isShown())
-                .variants(product.getVariants()
+                .variants(variantRepository.findByProduct(product)
                         .stream()
                         .filter(Variant::isActive)
                         .map(variantConverter::convertEntityToResponse)
@@ -45,7 +47,7 @@ public class ProductConverterImpl implements ProductConverter {
                 .image(product.getImage())
                 .isShown(product.isShown())
                 .category(product.getCategory().getName())
-                .variants(product.getVariants()
+                .variants(variantRepository.findByProduct(product)
                         .stream()
                         .filter(Variant::isActive)
                         .map(variantConverter::convertEntityToResponse)

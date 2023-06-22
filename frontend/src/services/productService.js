@@ -3,7 +3,7 @@ import httpRequest from '~/utils/httpRequest';
 export const getAll = async (token) => {
     try {
         return await httpRequest.get('/products', {
-            "headers" : {
+            "headers": {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             }
@@ -16,7 +16,7 @@ export const getAll = async (token) => {
 export const findById = async (id, token) => {
     try {
         return await httpRequest.get(`/products/${id}`, {
-            "headers" : {
+            "headers": {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             }
@@ -29,7 +29,7 @@ export const findById = async (id, token) => {
 export const save = async (product, token) => {
     try {
         return await httpRequest.post("/auth/products", product, {
-            "headers" : {
+            "headers": {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             }
@@ -42,7 +42,7 @@ export const save = async (product, token) => {
 export const update = async (product, token) => {
     try {
         return await httpRequest.put("/auth/products", product, {
-            "headers" : {
+            "headers": {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             }
@@ -52,22 +52,31 @@ export const update = async (product, token) => {
     }
 }
 
+export const updateShown = (id, shown, token) => {
+    try {
+        httpRequest
+            .patch(`/auth/products/${id}`, shown, {
+                "headers": {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then();
+    } catch (error) {
+        console.log("Axios lỗi productService updateShown :" + error);
+    }
+}
+
 export const deleteById = async (id, token) => {
     try {
         await httpRequest.delete(`/auth/products/${id}`, {
-            "headers" : {
+            "headers": {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             }
         });
     } catch (error) {
         console.log("Axios lỗi productService delete:" + error);
-    }
-}
-
-export const deleteByIds = (ids, token) => {
-    for (let id of ids) {
-        deleteById(id, token).then().catch(err => console.log(err));
     }
 }
 

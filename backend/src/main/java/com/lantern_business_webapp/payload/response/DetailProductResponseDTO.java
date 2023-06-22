@@ -16,7 +16,6 @@ import java.util.List;
 @AllArgsConstructor
 public class DetailProductResponseDTO extends ProductResponseDTO {
     private String description;
-    private List<VariantDTO> variants;
 
     @Override
     public String toString() {

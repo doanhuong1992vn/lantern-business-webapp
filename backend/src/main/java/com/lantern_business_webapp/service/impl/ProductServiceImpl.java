@@ -31,6 +31,18 @@ public class ProductServiceImpl implements ProductService {
     private final VariantConverter variantConverter;
 
     @Override
+    public ProductResponseDTO setShown(@NotNull @NotBlank String id, Boolean isShow) {
+        Optional<Product> optionalProduct = productRepository.findById(UUID.fromString(id));
+        if (optionalProduct.isPresent()) {
+            optionalProduct.get().setShown(isShow);
+            Product product = productRepository.save(optionalProduct.get());
+            return productConverter.convertEntityToResponse(product);
+        } else {
+            throw new NullPointerException();
+        }
+    }
+
+    @Override
     public ProductResponseDTO save(@NotNull ProductRequestDTO productRequestDTO) {
         Product product = productConverter.convertRequestToEntity(productRequestDTO);
         Product productDatabase = productRepository.save(product);
@@ -55,7 +67,8 @@ public class ProductServiceImpl implements ProductService {
             variantInputs.addAll(variantsToRemove);
         }
         variantRepository.saveAll(variantInputs);
-        return productConverter.convertEntityToResponse(productDatabase);
+        Product originProduct = productRepository.save(productDatabase);
+        return productConverter.convertEntityToResponse(originProduct);
     }
 
     @Override

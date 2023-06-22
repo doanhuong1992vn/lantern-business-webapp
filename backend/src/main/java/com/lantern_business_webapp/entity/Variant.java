@@ -33,7 +33,7 @@ public class Variant {
     private boolean active;
     @Column(name = "is_shown")
     private boolean isShown;
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", referencedColumnName = "id")
     private Product product;
     @ManyToOne(fetch = FetchType.EAGER)

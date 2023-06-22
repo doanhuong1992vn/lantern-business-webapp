@@ -1,4 +1,6 @@
+import {getDownloadURL, ref, uploadBytesResumable} from "firebase/storage";
 import React, {useContext, useEffect, useRef, useState} from 'react';
+import {useNavigate} from "react-router-dom";
 import {classNames} from 'primereact/utils';
 import {DataTable} from 'primereact/datatable';
 import {Column} from 'primereact/column';
@@ -10,20 +12,19 @@ import {RadioButton} from 'primereact/radiobutton';
 import {Dialog} from 'primereact/dialog';
 import {InputText} from 'primereact/inputtext';
 import storage from "~/firebaseConfig";
-import {getDownloadURL, ref, uploadBytesResumable} from "firebase/storage";
-
-
-import * as productService from '~/services/productService'
-import * as categoryService from "~/services/categoryService";
-import {useNavigate} from "react-router-dom";
-import AuthContext from "~/security/AuthContext";
-import * as sizeService from "~/services/sizeService";
-import * as colorService from "~/services/colorService";
 import {Checkbox} from "primereact/checkbox";
 import {MDBBtn, MDBTable, MDBTableBody, MDBTableHead} from "mdb-react-ui-kit";
 import {Editor} from "primereact/editor";
 import {InputNumber} from "primereact/inputnumber";
 import BootstrapSwitchButton from "bootstrap-switch-button-react";
+
+
+import * as productService from '~/services/productService'
+import * as categoryService from "~/services/categoryService";
+import * as variantService from "~/services/variantService";
+import * as sizeService from "~/services/sizeService";
+import * as colorService from "~/services/colorService";
+import AuthContext from "~/security/AuthContext";
 
 const Products = () => {
     let newProduct = {
@@ -49,9 +50,7 @@ const Products = () => {
     const [selectedCategory, setSelectedCategory] = useState(false);
     const [deleteVariantDialog, setDeleteVariantDialog] = useState(false);
     const [deleteProductDialog, setDeleteProductDialog] = useState(false);
-    const [deleteProductListDialog, setDeleteProductListDialog] = useState(false);
     const [globalFilter, setGlobalFilter] = useState(null);
-    const [selectedProductList, setSelectedProductList] = useState(null);
     const [variant, setVariant] = useState({});
     const [expandedRows, setExpandedRows] = useState([]);
 
@@ -185,7 +184,7 @@ const Products = () => {
                 quantity: null,
                 importPrice: null,
                 salePrice: null,
-                shown: true, //bên backend là shown, nhưng bên này để shown thì bên kia mới nhận được giá trị @@ đó là do quy tắc JavaBeans ???
+                shown: true, //bên backend là shown, nhưng bên này để shown thì bên kia mới nhận được giá trị @@ đó là do quy tắc JavaBeans
             }
             checkedColors.push({...variant});
             setCheckedColors(checkedColors);
@@ -241,11 +240,8 @@ const Products = () => {
     const handleAddVariant = (indexSize) => {
         setCheckedSizes(checkedSizes.map((item, index) => {
             if (index === indexSize) {
-                item.variants.push([...checkedColors].filter(variant => {
-                    if (item.variants.every(({color}) => color !== variant.color)) {
-                        return variant;
-                    }
-                }).shift())
+                item.variants.push(
+                    [...checkedColors].find(variant => item.variants.every(({color}) => color !== variant.color)))
             }
             item.isFullColor = item.variants.length >= checkedColors.length;
             return item;
@@ -272,7 +268,7 @@ const Products = () => {
                 const uploadTask = uploadBytesResumable(storageRef, file);
                 uploadTask.on(
                     "state_changed",
-                    (snapshot) => {
+                    () => {
                     },
                     (err) => console.log(err),
                     () => {
@@ -324,7 +320,12 @@ const Products = () => {
                 setProduct(response.data)
                 const index = findIndexById(product.id);
                 _productList[index] = response.data;
-                toast.current.show({severity: 'success', summary: 'Successful', detail: 'Product Updated', life: 5000});
+                toast.current.show({
+                    severity: 'success',
+                    summary: 'Successful',
+                    detail: 'Product Updated',
+                    life: 5000
+                });
             })
             .catch((error) => console.log(error));
     }
@@ -355,40 +356,18 @@ const Products = () => {
         setProductList(_products);
         setDeleteProductDialog(false);
         setProduct(newProduct);
-        toast.current.show({severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 5000});
-    };
-
-    const handleChangeProductsSelected = (e) => {
-        setSelectedProductList(e.value);
-    }
-
-    const handleConfirmDeleteProductsSelected = () => {
-        setDeleteProductListDialog(true);
-    };
-
-    const handleHideDeleteProductListDialog = () => {
-        setDeleteProductListDialog(false);
-    };
-
-    const handleDeleteSelectedProducts = () => {
-        let ids = [];
-        selectedProductList.map(item => ids.push(item.id));
-        console.log(ids);
-        productService.deleteByIds(ids, user.token);
-        let _products = productList.filter((val) => !selectedProductList.includes(val));
-        setProductList(_products);
-        setDeleteProductListDialog(false);
-        setSelectedProductList(null);
-        toast.current.show({severity: 'success', summary: 'Successful', detail: 'Products Deleted', life: 5000});
+        toast.current.show({
+            severity: 'success',
+            summary: 'Successful',
+            detail: 'Product Deleted',
+            life: 5000
+        });
     };
 
     const leftToolbarTemplate = () => {
         return (
             <div className="flex flex-wrap gap-2">
                 <Button label="New" icon="pi pi-plus" severity="success" onClick={handleOpenNewProductDialog}/>
-                <Button label="Delete" icon="pi pi-trash" severity="danger"
-                        onClick={handleConfirmDeleteProductsSelected}
-                        disabled={!selectedProductList || !selectedProductList.length}/>
             </div>
         );
     };
@@ -445,53 +424,81 @@ const Products = () => {
             <Button label="Yes" icon="pi pi-check" severity="danger" onClick={handleDeleteProduct}/>
         </React.Fragment>
     );
-    const deleteProductsDialogFooter = (
-        <React.Fragment>
-            <Button label="No" icon="pi pi-times" outlined onClick={handleHideDeleteProductListDialog}/>
-            <Button label="Yes" icon="pi pi-check" severity="danger" onClick={handleDeleteSelectedProducts}/>
-        </React.Fragment>
-    );
-
-    const shownOfProduct = (rowData) => (
-        <BootstrapSwitchButton checked={true} onstyle="light" offstyle="dark"
-                               style="border" onlabel="on" offlabel="off" size="sm" width="70"
-        />
-    );
 
     const onRowExpand = (event) => {
-        toast.current.show({ severity: 'info', summary: 'Product Expanded', detail: event.data.name, life: 3000 });
+        toast.current.show({
+            severity: 'info',
+            summary: 'Product Expanded',
+            detail: event.data.name,
+            life: 3000
+        });
     };
 
     const onRowCollapse = (event) => {
-        toast.current.show({ severity: 'success', summary: 'Product Collapsed', detail: event.data.name, life: 3000 });
+        toast.current.show({
+            severity: 'success',
+            summary: 'Product Collapsed',
+            detail: event.data.name,
+            life: 3000
+        });
     };
 
     const allowExpansion = (rowData) => {
         return rowData.variants.length > 0;
     };
 
+    const amountBodyTemplate = (price) => {
+        return price.toLocaleString('vi-VN', {style: 'currency', currency: 'VND'});
+    };
+
+    const handleChangeShownOfProduct = (id, shown) => {
+        productService.updateShown(id, shown, user.token);
+    }
+
+    const handleChangeShownOfVariant = (id, shown) => {
+        variantService.updateShown(id, shown, user.token);
+    }
+
+    const shownOfProduct = (product) => (
+        <BootstrapSwitchButton checked={product.shown}
+                               onChange={(shown) => handleChangeShownOfProduct(product.id, shown)}
+                               onstyle="light" offstyle="secondary"
+                               onlabel="on" offlabel="off"
+                               size="sm" width="70"/>
+    );
+
+    const shownOfVariant = (variant) => (
+        <BootstrapSwitchButton checked={variant.shown}
+                               onChange={(shown) => handleChangeShownOfVariant(variant.id, shown)}
+                               onstyle="light" offstyle="secondary"
+                               onlabel="on" offlabel="off"
+                               size="sm" width="70"/>
+    );
+
     const rowExpansionTemplate = (data) => {
         return (
             <div className="p-3">
-                <h5>Variants of {data.name}</h5>
-                <DataTable value={data.variants}>
+                <h5>Các mẫu mã của {data.name}</h5>
+                <DataTable value={data.variants} dataKey="id">
                     <Column field="size" header="Kích thước" sortable></Column>
                     <Column field="color" header="Màu sắc" sortable></Column>
-                    <Column field="importPrice" header="Giá nhập" body={amountBodyTemplate} sortable></Column>
-                    <Column field="importPrice" header="Giá nhập" body={amountBodyTemplate} sortable></Column>
-                    {/*<Column field="status" header="Status" body={statusOrderBodyTemplate} sortable></Column>*/}
-                    {/*<Column headerStyle={{ width: '4rem' }} body={searchBodyTemplate}></Column>*/}
+                    <Column field="importPrice"
+                            header="Giá nhập"
+                            body={(variant) => amountBodyTemplate(variant.importPrice)}
+                            sortable
+                    >
+                    </Column>
+                    <Column field="salePrice"
+                            header="Giá bán"
+                            body={(variant) => amountBodyTemplate(variant.salePrice)}
+                            sortable
+                    >
+                    </Column>
+                    <Column field="quantity" header="Số lượng" sortable></Column>
+                    <Column field="shown" header="Hiển thị" body={shownOfVariant}></Column>
                 </DataTable>
             </div>
         );
-    };
-
-    const formatCurrency = (value) => {
-        return value.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
-    };
-
-    const amountBodyTemplate = (rowData) => {
-        return formatCurrency(rowData.importPrice);
     };
 
     return (
@@ -502,8 +509,6 @@ const Products = () => {
 
                 <DataTable ref={dt}
                            value={productList}
-                           // selection={selectedProductList}
-                           // onSelectionChange={handleChangeProductsSelected}
                            expandedRows={expandedRows}
                            onRowToggle={(e) => setExpandedRows(e.data)}
                            rowExpansionTemplate={rowExpansionTemplate}
@@ -518,8 +523,7 @@ const Products = () => {
                            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
                            globalFilter={globalFilter}
                            header={header}>
-                    {/*<Column selectionMode="multiple" exportable={true}></Column>*/}
-                    <Column expander={allowExpansion} style={{ width: '5rem' }} />
+                    <Column expander={allowExpansion} style={{width: '5rem'}}/>
                     <Column field="name" header="Tên sản phẩm" sortable style={{minWidth: '16rem'}}></Column>
                     <Column field="image" header="Hình ảnh" body={imageBodyTemplate}></Column>
                     <Column field="category" header="Danh mục" sortable style={{minWidth: '10rem'}}></Column>
@@ -817,7 +821,7 @@ const Products = () => {
                     <i className="pi pi-exclamation-triangle mr-3" style={{fontSize: '2rem'}}/>
                     {variant && product && (
                         <span>
-                            Bạn có chắc chắn muốn xóa size <b>{variant.size}</b> màu <b>{variant.color}</b> của sản phẩm <b>{product.name || 'này'}</b> không?
+                            Bạn có chắc chắn muốn xóa size <strong>{variant.size}</strong> màu <strong>{variant.color}</strong> của sản phẩm <strong>{product.name || 'này'}</strong> không?
                         </span>
                     )}
                 </div>
@@ -831,18 +835,9 @@ const Products = () => {
                     <i className="pi pi-exclamation-triangle mr-3" style={{fontSize: '2rem'}}/>
                     {product && (
                         <span>
-                            Are you sure you want to delete <b>{product.name}</b>?
+                            Are you sure you want to delete <strong>{product.name}</strong>?
                         </span>
                     )}
-                </div>
-            </Dialog>
-
-            <Dialog visible={deleteProductListDialog} style={{width: '32rem'}}
-                    breakpoints={{'960px': '75vw', '641px': '90vw'}} header="Confirm" modal
-                    footer={deleteProductsDialogFooter} onHide={handleHideDeleteProductListDialog}>
-                <div className="confirmation-content">
-                    <i className="pi pi-exclamation-triangle mr-3" style={{fontSize: '2rem'}}/>
-                    {product && <span>Are you sure you want to delete the selected products?</span>}
                 </div>
             </Dialog>
         </div>

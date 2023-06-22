@@ -10,6 +10,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @RestController
 @RequiredArgsConstructor
@@ -41,7 +43,7 @@ public class AuthProductController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable String id) {
+    public ResponseEntity<?> delete(@PathVariable @NotNull @NotBlank String id) {
         ProductResponseDTO productResponseDTO = productService.findById(id);
         if (productResponseDTO == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -51,13 +53,12 @@ public class AuthProductController {
         }
     }
 
-//    @DeleteMapping
-//    public ResponseEntity<?> delete(@RequestBody Long[] ids) {
-//        boolean success = productService.deleteByIds(ids);
-//        if (success) {
-//            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-//        }
-//        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//    }
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> setShown(@PathVariable @NotNull @NotBlank String id, @RequestBody Boolean isShow) {
+        ProductResponseDTO productResponseDTO = productService.setShown(id, isShow);
+        return productResponseDTO == null
+                ? new ResponseEntity<>(HttpStatus.NOT_FOUND)
+                : new ResponseEntity<>(HttpStatus.OK);
+    }
 
 }

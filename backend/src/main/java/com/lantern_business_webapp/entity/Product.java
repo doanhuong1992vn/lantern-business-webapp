@@ -32,7 +32,7 @@ public class Product {
     private boolean active;
     @Column(name = "is_shown")
     private boolean isShown;
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Collection<Variant> variants;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id", referencedColumnName = "id")
