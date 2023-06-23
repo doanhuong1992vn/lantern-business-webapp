@@ -59,9 +59,6 @@ public class Variant {
         }
         Variant variant = (Variant) obj;
         return Objects.equals(id == null ? null : id.toString(), variant.id == null ? null : variant.id.toString())
-                && Objects.equals(importPrice, variant.getImportPrice())
-                && Objects.equals(salePrice, variant.getSalePrice())
-                && Objects.equals(quantity, variant.getQuantity())
                 && Objects.equals(size.getName(), variant.getSize().getName())
                 && Objects.equals(color.getName(), variant.getColor().getName());
     }

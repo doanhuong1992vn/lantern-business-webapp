@@ -51,7 +51,7 @@ public class ProductServiceImpl implements ProductService {
             variantInput.setProduct(productDatabase);
             return variantInput;
         }).toList());
-        List<Variant> variantsDatabase = variantRepository.findByProduct(productDatabase);
+        List<Variant> variantsDatabase = variantRepository.findByProductOrderByColorAsc(productDatabase);
         if (!variantsDatabase.isEmpty()) {
             variantInputs.forEach(variantInput -> {
                 variantsDatabase.forEach(variantDatabase -> {

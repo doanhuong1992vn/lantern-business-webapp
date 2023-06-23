@@ -25,6 +25,7 @@ import * as variantService from "~/services/variantService";
 import * as sizeService from "~/services/sizeService";
 import * as colorService from "~/services/colorService";
 import AuthContext from "~/security/AuthContext";
+import {InputSwitch} from "primereact/inputswitch";
 
 const Products = () => {
     let newProduct = {
@@ -240,8 +241,10 @@ const Products = () => {
     const handleAddVariant = (indexSize) => {
         setCheckedSizes(checkedSizes.map((item, index) => {
             if (index === indexSize) {
-                item.variants.push(
-                    [...checkedColors].find(variant => item.variants.every(({color}) => color !== variant.color)))
+                item.variants.push({
+                    ...[...checkedColors].find(variant => item.variants.every(({color}) => color !== variant.color)),
+                    shown: true
+                })
             }
             item.isFullColor = item.variants.length >= checkedColors.length;
             return item;
@@ -452,27 +455,41 @@ const Products = () => {
     };
 
     const handleChangeShownOfProduct = (id, shown) => {
+        setProductList(productList.map(product => {
+            if (product.id === id) {
+                product.shown = shown;
+            }
+            return product;
+        }))
         productService.updateShown(id, shown, user.token);
     }
 
-    const handleChangeShownOfVariant = (id, shown) => {
-        variantService.updateShown(id, shown, user.token);
+    const handleChangeShownOfVariant = (idProduct, variant) => {
+        setProductList(productList.map(product => {
+            if (product.id === idProduct) {
+                product.variants.forEach(item => {
+                    if (item.id === variant.id) {
+                        item.shown = !item.shown;
+                    }
+                })
+            }
+            return product;
+        }))
+        variantService.updateShown(variant.id, variant.shown, user.token);
     }
 
     const shownOfProduct = (product) => (
-        <BootstrapSwitchButton checked={product.shown}
-                               onChange={(shown) => handleChangeShownOfProduct(product.id, shown)}
-                               onstyle="light" offstyle="secondary"
-                               onlabel="on" offlabel="off"
-                               size="sm" width="70"/>
+        <InputSwitch checked={product.shown}
+                     tooltip={product.shown ? "ON" : "OFF"}
+                     onChange={() => handleChangeShownOfProduct(product.id, !product.shown)}
+        />
     );
 
-    const shownOfVariant = (variant) => (
-        <BootstrapSwitchButton checked={variant.shown}
-                               onChange={(shown) => handleChangeShownOfVariant(variant.id, shown)}
-                               onstyle="light" offstyle="secondary"
-                               onlabel="on" offlabel="off"
-                               size="sm" width="70"/>
+    const shownOfVariant = (idProduct, variant) => (
+        <InputSwitch checked={variant.shown}
+                     tooltip={variant.shown ? "ON" : "OFF"}
+                     onChange={() => handleChangeShownOfVariant(idProduct, variant)}
+        />
     );
 
     const rowExpansionTemplate = (data) => {
@@ -495,7 +512,7 @@ const Products = () => {
                     >
                     </Column>
                     <Column field="quantity" header="Số lượng" sortable></Column>
-                    <Column field="shown" header="Hiển thị" body={shownOfVariant}></Column>
+                    <Column field="shown" header="Hiển thị" body={(variant) => shownOfVariant(data.id, variant)}></Column>
                 </DataTable>
             </div>
         );
@@ -506,7 +523,6 @@ const Products = () => {
             <Toast ref={toast}/>
             <div className="card">
                 <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
-
                 <DataTable ref={dt}
                            value={productList}
                            expandedRows={expandedRows}
