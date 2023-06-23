@@ -20,7 +20,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "D:/Codegym/Projects/lantern-business-webapp/react-reduction-master",
+    "last_opened_file_path": "D:/Codegym/Projects/lantern-business-webapp/frontend",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -33,7 +33,11 @@
       <option name="presentableId" value="Default" />
       <updated>1686533635591</updated>
       <workItem from="1686533637218" duration="14000" />
+      <workItem from="1687509393894" duration="15000" />
     </task>
     <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
   </component>
 </project>
