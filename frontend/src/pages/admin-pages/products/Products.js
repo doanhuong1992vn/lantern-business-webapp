@@ -16,7 +16,6 @@ import {Checkbox} from "primereact/checkbox";
 import {MDBBtn, MDBTable, MDBTableBody, MDBTableHead} from "mdb-react-ui-kit";
 import {Editor} from "primereact/editor";
 import {InputNumber} from "primereact/inputnumber";
-import BootstrapSwitchButton from "bootstrap-switch-button-react";
 
 
 import * as productService from '~/services/productService'

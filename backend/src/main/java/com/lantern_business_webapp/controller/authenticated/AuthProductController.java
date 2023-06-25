@@ -24,7 +24,6 @@ public class AuthProductController {
     public ResponseEntity<?> save(
             @Valid @RequestBody ProductRequestDTO productRequestDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            System.out.println(bindingResult);
             return new ResponseEntity<>(bindingResult.getAllErrors(), HttpStatus.BAD_REQUEST);
         }
         ProductResponseDTO productResponseDTO = productService.save(productRequestDTO);
@@ -35,7 +34,6 @@ public class AuthProductController {
     public ResponseEntity<?> update(
             @Valid @RequestBody ProductRequestDTO productRequestDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            System.out.println(bindingResult);
             return new ResponseEntity<>(bindingResult.getAllErrors(), HttpStatus.BAD_REQUEST);
         }
         ProductResponseDTO productResponseDTO = productService.save(productRequestDTO);

@@ -88,7 +88,6 @@ public class UserPrincipal implements UserDetails {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UserPrincipal that = (UserPrincipal) o;
-//        return Objects.equals(id, that.id);
         return Objects.equals(id, that.id);
     }
 
