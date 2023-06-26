@@ -11,6 +11,10 @@ import com.lantern_business_webapp.repository.ProductRepository;
 import com.lantern_business_webapp.repository.VariantRepository;
 import com.lantern_business_webapp.service.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,6 +28,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@CacheConfig(cacheNames = "productCache")
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final VariantRepository variantRepository;
@@ -43,6 +48,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @CacheEvict(cacheNames = "products", allEntries = true)
     public ProductResponseDTO save(@NotNull ProductRequestDTO productRequestDTO) {
         Product product = productConverter.convertRequestToEntity(productRequestDTO);
         Product productDatabase = productRepository.save(product);
@@ -72,6 +78,10 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "product", key = "#id"),
+            @CacheEvict(cacheNames = "products", allEntries = true)
+    })
     public void delete(@NotNull @NotBlank String id) {
         Optional<Product> optionalProduct = productRepository.findById(UUID.fromString(id));
         if (optionalProduct.isPresent()) {
@@ -93,6 +103,7 @@ public class ProductServiceImpl implements ProductService {
 
 
     @Override
+    @Cacheable(cacheNames = "products")
     public List<ProductResponseDTO> findByActiveTrue() {
         return productRepository.findByActiveTrue().stream()
                 .map(productConverter::convertEntityToResponse)
@@ -109,25 +120,9 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.existsByNameAndActiveTrue(name);
     }
 
-    @Override
-    public boolean deleteByIds(String[] ids) {
-        List<Product> products = new ArrayList<>();
-        for (String id : ids) {
-            Optional<Product> optionalProduct = productRepository.findById(UUID.fromString(id));
-            if (optionalProduct.isPresent()) {
-                products.add(optionalProduct.get());
-            } else {
-                return false;
-            }
-        }
-        for (Product product : products) {
-            product.setActive(false);
-            productRepository.save(product);
-        }
-        return true;
-    }
 
     @Override
+    @Cacheable(cacheNames = "product", key = "#id", unless = "#result == null")
     public ProductResponseDTO findById(@NotNull @NotBlank String id) {
         return productRepository
                 .findById(UUID.fromString(id))

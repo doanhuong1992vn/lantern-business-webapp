@@ -1,6 +1,8 @@
 package com.lantern_business_webapp.configuration;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.annotation.EnableCaching;
@@ -17,7 +19,8 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
 @EnableCaching
-public class RedisConfig extends CachingConfigurerSupport {
+@AutoConfigureAfter(RedisAutoConfiguration.class)
+public class RedisConfiguration extends CachingConfigurerSupport {
     @Value("${spring.redis.host}")
     private String redisHost;
 

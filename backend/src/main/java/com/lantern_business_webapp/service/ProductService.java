@@ -16,7 +16,5 @@ public interface ProductService extends GeneralService<ProductRequestDTO, Produc
 
     boolean existsByNameAndActiveTrue(String name);
 
-    boolean deleteByIds(String[] ids);
-
     ProductResponseDTO setShown(String id, Boolean isShow);
 }
