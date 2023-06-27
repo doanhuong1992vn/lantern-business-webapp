@@ -19,7 +19,7 @@ public class ColorServiceImpl implements ColorService {
     private final ColorConverter colorConverter;
 
     @Override
-//    @Cacheable(cacheNames = "colors")
+    @Cacheable(cacheNames = "colors")
     public List<ColorDTO> findByActiveTrue() {
         return colorRepository.findByActiveTrue()
                 .stream().map(colorConverter::convertEntityToResponse).toList();

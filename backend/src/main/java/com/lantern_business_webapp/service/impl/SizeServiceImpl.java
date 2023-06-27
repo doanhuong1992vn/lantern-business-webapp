@@ -34,7 +34,7 @@ public class SizeServiceImpl implements SizeService {
     }
 
     @Override
-//    @Cacheable(cacheNames = "sizes")
+    @Cacheable(cacheNames = "sizes")
     public List<SizeDTO> findByActiveTrue() {
         return sizeRepository.findByActiveTrue()
                 .stream().map(sizeConverter::convertEntityToResponse).toList();
